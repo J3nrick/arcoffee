@@ -10,11 +10,16 @@ import '../../data/services/menu_service.dart';
 import '../../data/services/store_service.dart';
 import '../app_scaffold.dart';
 
-/// High-performance, 60fps Native Splash Screen for Arcoffee.
-/// Adheres strictly to Apple Human Interface Guidelines (HIG).
+/// Luxury Editorial Splash Screen & Seamless Transition for ARCOFFEE.
 ///
-/// Animates the official static brand logo using native Flutter transitions
-/// and transitions seamlessly into the Home screen after the sequence completes.
+/// Implements a 5-second cinematic brand experience:
+/// - 0.0s - 1.2s: Fluid cinematic entrance (opacity 0 -> 1, scale 0.94 -> 1.0, subtle rise)
+/// - 1.2s - 3.8s: Organic living breath with high-fashion editorial metadata reveal
+/// - 3.8s - 5.0s: Masterful choreographed transition into the Home view:
+///                Logo gently elevates (-30px) and expands (1.0 -> 1.08) while dissolving,
+///                as AppScaffold floats upward and blooms seamlessly on the shared cream canvas.
+///
+/// Built with pure Flutter animations, 60fps native performance, and zero external packages.
 class SplashScreen extends StatefulWidget {
   final Widget? homeScreen;
 
@@ -28,11 +33,20 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _fadeAnimation;
-  late final Animation<double> _scaleAnimation;
-  Timer? _holdTimer;
+    with TickerProviderStateMixin {
+  late final AnimationController _introController;
+  late final AnimationController _breathController;
+
+  late final Animation<double> _introFade;
+  late final Animation<double> _introScale;
+  late final Animation<Offset> _introSlide;
+
+  late final Animation<double> _breathScale;
+  late final Animation<double> _taglineFade;
+  late final Animation<Offset> _taglineSlide;
+
+  Timer? _navigationTimer;
+  bool _isNavigating = false;
 
   // Exact sampled cream background from the brand logo asset to ensure zero borders
   static const Color creamBackground = Color(0xFFFBF7EB);
@@ -43,55 +57,114 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // 1. Initialize controller for 1000ms entrance animation
-    _controller = AnimationController(
+    // 1. Phase 1: Entrance animation (0 to 1200ms)
+    _introController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1200),
     );
 
-    // 2. Strict Apple HIG spring / easeOutCubic curve
-    final CurvedAnimation curvedAnimation = CurvedAnimation(
-      parent: _controller,
+    final CurvedAnimation introDecel = CurvedAnimation(
+      parent: _introController,
       curve: Curves.easeOutCubic,
     );
 
-    // 3. Opacity: 0.0 -> 1.0
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(curvedAnimation);
+    _introFade = Tween<double>(begin: 0.0, end: 1.0).animate(introDecel);
 
-    // 4. Scale: 0.95 -> 1.0
-    _scaleAnimation = Tween<double>(
-      begin: 0.95,
-      end: 1.0,
-    ).animate(curvedAnimation);
+    _introScale = Tween<double>(begin: 0.94, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _introController,
+        curve: Curves.easeOutQuart,
+      ),
+    );
 
-    // 5. Trigger entrance animation in initState
-    _controller.forward().then((_) {
+    _introSlide = Tween<Offset>(
+      begin: const Offset(0.0, 0.04),
+      end: Offset.zero,
+    ).animate(introDecel);
+
+    // 2. Phase 2: Living breath & editorial metadata reveal (1200ms to 3800ms)
+    _breathController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2600),
+    );
+
+    _breathScale = Tween<double>(begin: 1.0, end: 1.028).animate(
+      CurvedAnimation(
+        parent: _breathController,
+        curve: Curves.easeInOutSine,
+      ),
+    );
+
+    _taglineFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _breathController,
+        curve: const Interval(0.20, 0.65, curve: Curves.easeOut),
+      ),
+    );
+
+    _taglineSlide = Tween<Offset>(
+      begin: const Offset(0.0, 0.15),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _breathController,
+        curve: const Interval(0.20, 0.70, curve: Curves.easeOutCubic),
+      ),
+    );
+
+    // Start intro immediately; chain living breath right after
+    _introController.forward().then((_) {
       if (!mounted) return;
-      // 6. Hold for 1500ms after entrance completes, then navigate
-      _holdTimer = Timer(const Duration(milliseconds: 1500), _navigateToHome);
+      _breathController.forward();
     });
+
+    // 3. Phase 3: At 3800ms, automatically trigger the 1200ms cinematic transition to Home
+    // (Total splash duration = 3800ms hold + 1200ms transition = 5000ms / 5 seconds)
+    _navigationTimer = Timer(const Duration(milliseconds: 3800), _navigateToHome);
   }
 
   void _navigateToHome() {
-    if (!mounted) return;
+    if (_isNavigating || !mounted) return;
+    _isNavigating = true;
 
     final targetScreen = widget.homeScreen ?? _createDefaultHomeScreen();
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 500),
+        transitionDuration: const Duration(milliseconds: 1200),
         pageBuilder: (context, animation, secondaryAnimation) => targetScreen,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final fade = CurvedAnimation(
+          // Luxury Apple Keynote-style transition:
+          // Incoming Home screen floats upward and dissolves in smoothly
+          final curved = CurvedAnimation(
             parent: animation,
-            curve: Curves.easeOutCubic,
+            curve: Curves.easeOutQuart,
           );
+
+          final slideAnim = Tween<Offset>(
+            begin: const Offset(0.0, 0.035),
+            end: Offset.zero,
+          ).animate(curved);
+
+          final scaleAnim = Tween<double>(
+            begin: 0.985,
+            end: 1.0,
+          ).animate(curved);
+
+          final fadeAnim = CurvedAnimation(
+            parent: animation,
+            curve: const Interval(0.10, 1.0, curve: Curves.easeOutCubic),
+          );
+
           return FadeTransition(
-            opacity: fade,
-            child: child,
+            opacity: fadeAnim,
+            child: SlideTransition(
+              position: slideAnim,
+              child: ScaleTransition(
+                scale: scaleAnim,
+                child: child,
+              ),
+            ),
           );
         },
       ),
@@ -113,33 +186,133 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _holdTimer?.cancel();
-    _controller.dispose();
+    _navigationTimer?.cancel();
+    _introController.dispose();
+    _breathController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: creamBackground,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 420,
-                maxHeight: 260,
-              ),
-              child: Image.asset(
-                logoAsset,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
+    // Check if the route is exiting to coordinate simultaneous outgoing motion
+    final secondaryAnim = ModalRoute.of(context)?.secondaryAnimation;
+
+    Widget body = Center(
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_introController, _breathController]),
+        builder: (context, _) {
+          final double combinedScale = _introScale.value * _breathScale.value;
+
+          return FadeTransition(
+            opacity: _introFade,
+            child: SlideTransition(
+              position: _introSlide,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 1. Iconic Arcoffee Brand Mark
+                  Transform.scale(
+                    scale: combinedScale,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 420,
+                        maxHeight: 250,
+                      ),
+                      child: Image.asset(
+                        logoAsset,
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.high,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // 2. High-Fashion Editorial Metadata Colophon
+                  FadeTransition(
+                    opacity: _taglineFade,
+                    child: SlideTransition(
+                      position: _taglineSlide,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Hairline court line
+                          Container(
+                            width: 36,
+                            height: 1,
+                            color: const Color(0xFF0B1F33).withValues(alpha: 0.16),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'ARCOFFEE',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 4.8,
+                              color: Color(0xFF0B1F33),
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'COURT-SIDE COFFEE CULTURE  •  THE PICKLEGROUND PH',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 2.4,
+                              color: const Color(0xFFF36B21).withValues(alpha: 0.92),
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ),
+          );
+        },
+      ),
+    );
+
+    // If route is exiting, orchestrate the splash elements lifting & dissolving
+    if (secondaryAnim != null) {
+      body = AnimatedBuilder(
+        animation: secondaryAnim,
+        builder: (context, child) {
+          final exitCurved = CurvedAnimation(
+            parent: secondaryAnim,
+            curve: Curves.easeInCubic,
+          );
+
+          final exitFade = 1.0 - (exitCurved.value * 1.0);
+          final exitSlideY = -0.06 * exitCurved.value;
+          final exitScale = 1.0 + (exitCurved.value * 0.08);
+
+          return Transform.translate(
+            offset: Offset(0, exitSlideY * 300),
+            child: Transform.scale(
+              scale: exitScale,
+              child: Opacity(
+                opacity: exitFade.clamp(0.0, 1.0),
+                child: child,
+              ),
+            ),
+          );
+        },
+        child: body,
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: creamBackground,
+      // Tap anywhere to instantly trigger the smooth transition to Home if eager
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _navigateToHome,
+        child: body,
       ),
     );
   }

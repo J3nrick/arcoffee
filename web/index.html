@@ -101,7 +101,7 @@
     (function () {
       var startTime = Date.now();
       var isDismissed = false;
-      var MAX_SPLASH_TIME = 3000; // Strict 3 seconds maximum display time
+      var MAX_SPLASH_TIME = 6000; // Safety fallback timeout
 
       function dismissSplash() {
         if (isDismissed) return;
