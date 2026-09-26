@@ -7,6 +7,7 @@ import 'data/services/gallery_service.dart';
 import 'data/services/menu_service.dart';
 import 'data/services/store_service.dart';
 import 'features/app_scaffold.dart';
+import 'features/splash/splash_screen.dart';
 import 'shared/widgets/custom_cursor.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_controller.dart';
@@ -76,10 +77,12 @@ class _ArcoffeeAppState extends State<ArcoffeeApp> {
                 child: child ?? const SizedBox.shrink(),
               );
             },
-            home: AppScaffold(
-              menuRepository: _menuRepository,
-              storeRepository: _storeRepository,
-              galleryRepository: _galleryRepository,
+            home: SplashScreen(
+              homeScreen: AppScaffold(
+                menuRepository: _menuRepository,
+                storeRepository: _storeRepository,
+                galleryRepository: _galleryRepository,
+              ),
             ),
           ),
         );
