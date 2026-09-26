@@ -108,7 +108,7 @@ class _AppScaffoldState extends State<AppScaffold> {
             ),
 
             // Mobile Bottom Navigation Bar (Apple HIG iOS pattern)
-            if (isMobile) _buildMobileBottomBar(),
+            if (Responsive.isMobile(context)) _buildMobileBottomBar(theme),
           ],
         ),
       ),

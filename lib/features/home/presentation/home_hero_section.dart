@@ -21,6 +21,7 @@ class HomeHeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeScope.of(context);
     final isDesktop = Responsive.isDesktop(context);
     final horizontalPad = Responsive.horizontalPadding(context);
 
