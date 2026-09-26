@@ -5,9 +5,9 @@ import '../../core/design/app_colors.dart';
 import '../../core/design/app_typography.dart';
 import '../../theme/theme_controller.dart';
 import 'arco_court_line.dart';
-import 'arco_sticker.dart';
 
 /// Minimal Editorial Brand Footer for Arcoffee.
+/// Matches the blueprint: Large typography, slogan, and category pillars.
 class ArcoFooter extends StatelessWidget {
   final ValueChanged<int>? onNavigate;
 
@@ -17,61 +17,92 @@ class ArcoFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ThemeScope.of(context);
     final isDark = theme.isMidnightCourt;
-    final isMobile = AppBreakpoints.isMobile(context);
+    final isDesktop = AppBreakpoints.isDesktop(context);
 
     return Container(
       width: double.infinity,
       color: isDark ? AppColors.surfaceNightL1 : AppColors.surfaceDayL1,
       padding: EdgeInsets.symmetric(
         horizontal: AppBreakpoints.horizontalPadding(context),
-        vertical: 48,
+        vertical: 56,
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: AppBreakpoints.desktopMax),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const ArcoCourtLine(),
-            const SizedBox(height: 32),
-            if (isMobile)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildBrandBlock(theme, isDark),
-                  const SizedBox(height: 32),
-                  _buildFooterLinks(theme, isDark),
-                ],
-              )
-            else
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(flex: 5, child: _buildBrandBlock(theme, isDark)),
-                  Expanded(flex: 5, child: _buildFooterLinks(theme, isDark)),
-                ],
-              ),
+            ArcoCourtLine(
+              width: double.infinity,
+              height: 1.2,
+              color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
+            ),
             const SizedBox(height: 48),
-            const ArcoCourtLine(),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+            // Large Center Editorial Brand Statement
+            Text(
+              "ARCOFFEE",
+              style: AppTypography.displayXL.copyWith(
+                fontSize: isDesktop ? 44 : 32,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1.2,
+                color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            Text(
+              "\"${AppConstants.slogan}\"".toUpperCase(),
+              style: AppTypography.scoreboard.copyWith(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 2.0,
+                color: AppColors.accentOrange,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Category Pillars
+            Text(
+              "COFFEE  /  COMMUNITY  /  SPORT  /  NIGHTLIFE",
+              style: AppTypography.scoreboard.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.5,
+                color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 40),
+
+            // Navigation Links Row
+            Wrap(
+              spacing: 28,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
               children: [
-                Text(
-                  "© ${DateTime.now().year} ARCOFFEE • ALL RIGHTS RESERVED",
-                  style: AppTypography.receipt.copyWith(
-                    fontSize: 11,
-                    color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay,
-                  ),
-                ),
-                Text(
-                  "COURT-SIDE COFFEE CULTURE",
-                  style: AppTypography.eyebrow.copyWith(
-                    fontSize: 10,
-                    color: AppColors.accentOrange,
-                  ),
-                ),
+                _buildFooterLink("HOME", 0, isDark),
+                _buildFooterLink("MENU", 1, isDark),
+                _buildFooterLink("COMMUNITY", 2, isDark),
+                _buildFooterLink("LOCATION", 3, isDark),
               ],
+            ),
+            const SizedBox(height: 40),
+
+            ArcoCourtLine(
+              width: 160,
+              height: 1.0,
+              color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
+            ),
+            const SizedBox(height: 20),
+
+            // Bottom Receipt Metadata
+            Text(
+              "© ${DateTime.now().year} ARCOFFEE CO.  •  THE PICKLEGROUND PH, KAWIT, CAVITE  •  24H WEEKEND SESSION",
+              style: AppTypography.receipt.copyWith(
+                fontSize: 11,
+                letterSpacing: 0.8,
+                color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -79,110 +110,21 @@ class ArcoFooter extends StatelessWidget {
     );
   }
 
-  Widget _buildBrandBlock(ThemeController theme, bool isDark) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              "ARCOFFEE",
-              style: AppTypography.headingXL.copyWith(
-                color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                letterSpacing: -1.0,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const ArcoSticker(text: "COURT SIDE", rotation: -0.05),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "\"${AppConstants.slogan}\"",
-          style: AppTypography.bodyLarge.copyWith(
-            fontStyle: FontStyle.italic,
-            color: AppColors.accentOrange,
-            fontWeight: FontWeight.w600,
+  Widget _buildFooterLink(String label, int index, bool isDark) {
+    return GestureDetector(
+      onTap: () => onNavigate?.call(index),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Text(
+          label,
+          style: AppTypography.scoreboard.copyWith(
+            fontSize: 12,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.w700,
+            color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
           ),
         ),
-        const SizedBox(height: 12),
-        Text(
-          "The Pickleground PH, Kawit / Noveleta, Cavite.\nMon–Thu: 2PM–10PM | Fri–Sun: 24 Hours",
-          style: AppTypography.bodySmall.copyWith(
-            color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFooterLinks(ThemeController theme, bool isDark) {
-    final links = [
-      ("Home", 0),
-      ("Menu", 1),
-      ("Community Board", 2),
-      ("Location & Hours", 3),
-    ];
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "NAVIGATION",
-              style: AppTypography.eyebrow.copyWith(
-                color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ...links.map((link) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: GestureDetector(
-                    onTap: () => onNavigate?.call(link.$2),
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Text(
-                        link.$1,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                        ),
-                      ),
-                    ),
-                  ),
-                )),
-          ],
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "CONNECT",
-              style: AppTypography.eyebrow.copyWith(
-                color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text("Instagram: @arcoffee.ph",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue)),
-            const SizedBox(height: 8),
-            Text("Facebook: /arcoffee.ph",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue)),
-            const SizedBox(height: 8),
-            Text("TikTok: @arcoffee.ph",
-                style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue)),
-          ],
-        ),
-      ],
+      ),
     );
   }
 }

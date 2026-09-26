@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import '../../../core/design/app_breakpoints.dart';
 import '../../../core/design/app_colors.dart';
-import '../../../core/design/app_radii.dart';
 import '../../../core/design/app_typography.dart';
+import '../../../core/utils/image_precacher.dart';
 import '../../../data/models/gallery_item.dart';
 import '../../../data/repositories/gallery_repository.dart';
-import '../../../shared/components/arco_sticker.dart';
+import '../../../shared/components/arco_court_line.dart';
 import '../../../theme/theme_controller.dart';
 
-/// "The Arcoffee Wall" Community Section: Curated collage of photography,
-/// stickers, court atmosphere, and social coffee culture.
+/// "The Arcoffee Wall" Editorial Collage Section.
+/// Implements varied margin offsets and photographic storytelling instead of uniform grid.
 class GalleryView extends StatefulWidget {
   final GalleryRepository repository;
 
@@ -21,8 +21,29 @@ class GalleryView extends StatefulWidget {
 
 class _GalleryViewState extends State<GalleryView> {
   List<GalleryItem> _items = [];
-  final Set<String> _likedIds = {};
   bool _isLoading = true;
+
+  // Curated photographic lifestyle assets representing court, coffee, community
+  static const List<Map<String, String>> _editorialPhotos = [
+    {
+      'url': 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&q=80',
+      'title': 'COURT ACTION',
+      'caption': 'SATURDAY / 08:42 PM',
+      'story': 'Full court lighting during our 24-hour weekend session at The Pickleground.',
+    },
+    {
+      'url': 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',
+      'title': 'COMMUNITY',
+      'caption': 'GOOD COFFEE. GOOD PEOPLE.',
+      'story': 'Post-match debrief with cold brews, sparklers, and local players.',
+    },
+    {
+      'url': 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80',
+      'title': 'NIGHT VIBE',
+      'caption': 'KAWIT, CAVITE',
+      'story': 'The rallies don\'t stop when the sun sets. Midnight coffee bar open all weekend.',
+    },
+  ];
 
   @override
   void initState() {
@@ -39,23 +60,11 @@ class _GalleryViewState extends State<GalleryView> {
     });
   }
 
-  void _toggleLike(String id) async {
-    setState(() {
-      if (_likedIds.contains(id)) {
-        _likedIds.remove(id);
-      } else {
-        _likedIds.add(id);
-      }
-    });
-    await widget.repository.toggleLike(id);
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = ThemeScope.of(context);
     final isDark = theme.isMidnightCourt;
-    final isMobile = AppBreakpoints.isMobile(context);
-    final isTablet = AppBreakpoints.isTablet(context);
+    final isDesktop = AppBreakpoints.isDesktop(context);
     final horizontalPad = AppBreakpoints.horizontalPadding(context);
 
     if (_isLoading) {
@@ -69,214 +78,188 @@ class _GalleryViewState extends State<GalleryView> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: horizontalPad, vertical: 36),
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPad,
+        vertical: isDesktop ? 64.0 : 36.0,
+      ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: AppBreakpoints.desktopMax),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Editorial Header Banner
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const ArcoSticker(text: "THE ARCOFFEE WALL", rotation: -0.02),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Courtside Community Stories",
-                        style: AppTypography.display.copyWith(
-                          color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                          fontSize: isMobile ? 26 : 36,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        "Good coffee, intense rallies, and round-the-clock weekend sessions at The Pickleground PH.",
-                        style: AppTypography.bodyLarge.copyWith(
-                          color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
-                        ),
-                      ),
-                    ],
-                  ),
+            // Section Header & Brand Monospaced Label
+            Text(
+              "AR / 003   |   THE ARCOFFEE WALL (EDITORIAL COLLAGE)",
+              style: AppTypography.scoreboard.copyWith(
+                fontSize: 12,
+                letterSpacing: 1.5,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ArcoCourtLine(
+              width: double.infinity,
+              height: 1.2,
+              color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
+            ),
+            const SizedBox(height: 18),
+
+            Text(
+              "Good Coffee. Good People. Good Games.",
+              style: AppTypography.display.copyWith(
+                color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+                fontSize: isDesktop ? 36 : 26,
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            // Editorial Asymmetric Photo Collage
+            if (isDesktop)
+              _buildDesktopEditorialCollage(isDark)
+            else
+              _buildMobileCollage(isDark),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Desktop Asymmetrical Collage with Varied Margin Offsets
+  Widget _buildDesktopEditorialCollage(bool isDark) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Photo 1: Large Court Action (Offset Top: 0)
+        Expanded(
+          flex: 4,
+          child: _buildCollageTile(
+            photo: _editorialPhotos[0],
+            isDark: isDark,
+            height: 380,
+            topOffset: 0,
+          ),
+        ),
+        const SizedBox(width: 28),
+
+        // Photo 2: Lifestyle Candid (Offset Top: 54px for scrapbooked editorial rhythm)
+        Expanded(
+          flex: 3,
+          child: _buildCollageTile(
+            photo: _editorialPhotos[1],
+            isDark: isDark,
+            height: 320,
+            topOffset: 54,
+          ),
+        ),
+        const SizedBox(width: 28),
+
+        // Photo 3: Nighttime Vibe (Offset Top: 24px)
+        Expanded(
+          flex: 4,
+          child: _buildCollageTile(
+            photo: _editorialPhotos[2],
+            isDark: isDark,
+            height: 360,
+            topOffset: 24,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Mobile Stacked Collage
+  Widget _buildMobileCollage(bool isDark) {
+    return Column(
+      children: _editorialPhotos.map((photo) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 32.0),
+          child: _buildCollageTile(
+            photo: photo,
+            isDark: isDark,
+            height: 260,
+            topOffset: 0,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  /// Individual Editorial Photo Tile with Monospaced Metadata & Narrative
+  Widget _buildCollageTile({
+    required Map<String, String> photo,
+    required bool isDark,
+    required double height,
+    required double topOffset,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(top: topOffset),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Photography Box with Depth
+          Container(
+            height: height,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.08),
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.deepBlue.withOpacity(isDark ? 0.35 : 0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-            const SizedBox(height: 36),
-
-            // Wall Grid Polaroid Collage
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: isMobile ? 1 : (isTablet ? 2 : 3),
-                crossAxisSpacing: 24,
-                mainAxisSpacing: 24,
-                childAspectRatio: isMobile ? 0.85 : 0.80,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: ArcoffeeNetworkImage(
+                imageUrl: photo['url']!,
+                fit: BoxFit.cover,
+                borderRadius: 16,
               ),
-              itemCount: _items.length,
-              itemBuilder: (context, index) {
-                final item = _items[index];
-                final isLiked = _likedIds.contains(item.id);
-                final rotation = (index % 3 == 0)
-                    ? 0.012
-                    : (index % 3 == 1)
-                        ? -0.015
-                        : 0.008;
-
-                return Transform.rotate(
-                  angle: isMobile ? 0.0 : rotation,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? AppColors.surfaceNightL2 : AppColors.pureWhite,
-                      borderRadius: AppRadii.xl,
-                      border: Border.all(
-                        color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.08),
-                        width: 1.2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark ? const Color(0x40000000) : AppColors.deepBlue.withOpacity(0.06),
-                          blurRadius: 18,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Image Container Frame
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      item.primaryColor.withOpacity(isDark ? 0.3 : 0.15),
-                                      item.secondaryColor.withOpacity(isDark ? 0.2 : 0.08),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: AppRadii.lg,
-                                ),
-                                alignment: Alignment.center,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      item.icon,
-                                      size: 40,
-                                      color: item.primaryColor,
-                                    ),
-                                    const SizedBox(height: 10),
-                                    ArcoSticker(
-                                      text: item.category.toUpperCase(),
-                                      rotation: 0.0,
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Top Right Timestamp Tag
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xCC07111D)
-                                        : AppColors.pureWhite.withOpacity(0.9),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    item.timestamp,
-                                    style: AppTypography.receipt.copyWith(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: isDark ? AppColors.textSecondaryNight : AppColors.deepBlue,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-
-                        // Title
-                        Text(
-                          item.title,
-                          style: AppTypography.headingSmall.copyWith(
-                            color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-
-                        // Subtitle Story Caption
-                        Text(
-                          item.subtitle,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Bottom Actions: Like count & Location tag
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "KAWIT, CAVITE",
-                              style: AppTypography.receipt.copyWith(
-                                color: AppColors.accentOrange,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 11,
-                              ),
-                            ),
-                            CupertinoButton(
-                              padding: EdgeInsets.zero,
-                              minSize: 32,
-                              onPressed: () => _toggleLike(item.id),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isLiked ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                                    size: 16,
-                                    color: isLiked ? AppColors.accentOrange : (isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    "${(int.tryParse(item.likesCount) ?? 100) + (isLiked ? 1 : 0)}",
-                                    style: AppTypography.receipt.copyWith(
-                                      color: isLiked ? AppColors.accentOrange : (isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 14),
+
+          // Monospaced Timestamp / Tag
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                photo['caption']!,
+                style: AppTypography.scoreboard.copyWith(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.0,
+                  color: AppColors.accentOrange,
+                ),
+              ),
+              Text(
+                photo['title']!,
+                style: AppTypography.receipt.copyWith(
+                  fontSize: 10,
+                  letterSpacing: 0.8,
+                  color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+
+          // Story Text
+          Text(
+            photo['story']!,
+            style: AppTypography.bodySmall.copyWith(
+              color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+              height: 1.4,
+            ),
+          ),
+        ],
       ),
     );
   }

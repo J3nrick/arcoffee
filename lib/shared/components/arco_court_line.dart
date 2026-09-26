@@ -9,6 +9,7 @@ class ArcoCourtLine extends StatelessWidget {
   final double? height;
   final bool isVertical;
   final bool isDashed;
+  final Color? color;
 
   const ArcoCourtLine({
     super.key,
@@ -16,26 +17,27 @@ class ArcoCourtLine extends StatelessWidget {
     this.height,
     this.isVertical = false,
     this.isDashed = false,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = ThemeScope.of(context);
     final isDark = theme.isMidnightCourt;
-    final color = isDark ? AppColors.courtLineNight : AppColors.courtLineDay;
+    final lineColor = color ?? (isDark ? AppColors.courtLineNight : AppColors.courtLineDay);
 
     if (isVertical) {
       return Container(
         width: width ?? 1.0,
         height: height ?? double.infinity,
-        color: color,
+        color: lineColor,
       );
     }
 
     return Container(
       width: width ?? double.infinity,
       height: height ?? 1.0,
-      color: color,
+      color: lineColor,
     );
   }
 }

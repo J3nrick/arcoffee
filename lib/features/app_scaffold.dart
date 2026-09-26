@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import '../core/design/app_breakpoints.dart';
 import '../core/design/app_colors.dart';
-import '../core/design/app_radii.dart';
 import '../data/models/menu_item.dart';
 import '../data/repositories/gallery_repository.dart';
 import '../data/repositories/menu_repository.dart';
@@ -115,16 +114,23 @@ class _AppScaffoldState extends State<AppScaffold> {
   Widget _buildCurrentViewBody() {
     switch (_currentTabIndex) {
       case 0:
+        // Complete Editorial Brand Journey matching ASCII Structural Blueprint
         return Column(
           children: [
+            // AR / 001: Asymmetrical Hero Section
             HomeHeroSection(
               onExploreMenu: () => _onTabSelected(1),
               onViewLocation: () => _onTabSelected(3),
             ),
+            // AR / 002: Signature Drinks Editorial Showcase
             HomeHighlightsSection(
               featuredItems: _featuredItems,
               onExploreFullMenu: () => _onTabSelected(1),
             ),
+            // AR / 003: The Arcoffee Wall (Editorial Collage)
+            GalleryView(repository: widget.galleryRepository),
+            // AR / 004: Find Us At The Court
+            LocationView(repository: widget.storeRepository),
           ],
         );
       case 1:
