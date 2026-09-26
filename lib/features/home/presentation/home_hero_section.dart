@@ -244,60 +244,180 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
       width: double.infinity,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0F1D2B) : AppColors.softSand,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.12),
           width: 1.2,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? const Color(0x40000000) : AppColors.deepBlue.withOpacity(0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
+          // Background Court Boundary Lines
           const Positioned(
-            top: 20,
-            left: 20,
-            child: ArcoCourtLine(width: 100, height: 1.0),
+            top: 24,
+            left: 24,
+            child: ArcoCourtLine(width: 140, height: 1.2),
           ),
           const Positioned(
-            top: 20,
-            left: 20,
-            child: ArcoCourtLine(width: 1.0, height: 80, isVertical: true),
+            top: 24,
+            left: 24,
+            child: ArcoCourtLine(width: 1.2, height: 100, isVertical: true),
           ),
+          const Positioned(
+            bottom: 24,
+            right: 24,
+            child: ArcoCourtLine(width: 140, height: 1.2),
+          ),
+          const Positioned(
+            bottom: 24,
+            right: 24,
+            child: ArcoCourtLine(width: 1.2, height: 100, isVertical: true),
+          ),
+
+          // Central Editorial Polaroid Card Composition
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 84,
-                  height: 84,
-                  decoration: BoxDecoration(
-                    color: AppColors.accentOrange,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.accentOrange.withOpacity(0.4),
-                        blurRadius: 28,
-                        offset: const Offset(0, 8),
+            child: Transform.rotate(
+              angle: -0.02,
+              child: Container(
+                width: height * 0.72,
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 20),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF162536) : AppColors.pureWhite,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.deepBlue.withOpacity(isDark ? 0.4 : 0.12),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Photo Placeholder with Drink Graphic
+                    Container(
+                      height: height * 0.45,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.accentOrange.withOpacity(0.2),
+                            isDark ? const Color(0xFF0F1F30) : AppColors.softSand,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    CupertinoIcons.circle_grid_hex_fill,
-                    size: 44,
-                    color: AppColors.pureWhite,
-                  ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 68,
+                            height: 68,
+                            decoration: BoxDecoration(
+                              color: AppColors.accentOrange,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.accentOrange.withOpacity(0.4),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              CupertinoIcons.circle_grid_hex_fill,
+                              size: 36,
+                              color: AppColors.pureWhite,
+                            ),
+                          ),
+                          const Positioned(
+                            top: 8,
+                            right: 8,
+                            child: ArcoSticker(text: "MATCH READY", rotation: 0.04),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Polaroid Caption
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Kawit, Cavite ♥",
+                          style: AppTypography.receipt.copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+                          ),
+                        ),
+                        Text(
+                          "EST. 2024",
+                          style: AppTypography.scoreboard.copyWith(
+                            fontSize: 10,
+                            color: AppColors.accentOrange,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  "MILO OVERLOAD & EXPRESSO RUSH",
-                  style: AppTypography.scoreboard.copyWith(
-                    fontSize: 12,
-                    color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const ArcoSticker(text: "PLAY. SIP. REPEAT.", rotation: 0.02),
-              ],
+              ),
             ),
+          ),
+
+          // Circular Brand Stamp (Top Right Floating Badge)
+          Positioned(
+            top: 16,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.accentOrange,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.accentOrange.withOpacity(0.35),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(CupertinoIcons.sparkles, size: 16, color: AppColors.pureWhite),
+                  SizedBox(height: 2),
+                  Text(
+                    "24H",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.pureWhite,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Bottom Sticker Accent
+          const Positioned(
+            bottom: 16,
+            left: 20,
+            child: ArcoSticker(text: "PLAY. SIP. REPEAT.", rotation: 0.02),
           ),
         ],
       ),

@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_typography.dart';
+import '../../../../core/design/app_colors.dart';
+import '../../../../core/design/app_typography.dart';
 import '../../../../data/models/menu_item.dart';
-import '../../../../shared/widgets/badge_pill.dart';
-import '../../../../shared/widgets/frosted_glass_container.dart';
+import '../../../../shared/components/arco_glass_surface.dart';
 import '../../../../theme/theme_controller.dart';
 
 /// Apple HIG Interactive "Build Your Drink" configuration modal sheet.
@@ -71,19 +70,14 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 540),
-        child: FrostedGlassContainer(
+        child: ArcoGlassSurface(
           margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
           borderRadius: 26,
           blurSigma: 24.0,
           backgroundColor: isDark
               ? const Color(0xE60F1B28)
-              : AppColors.creamBackground.withOpacity(0.92),
-          borderColor: isDark ? const Color(0x408FA2B5) : AppColors.borderLight,
-          shadow: const BoxShadow(
-            color: Color(0x40000000),
-            blurRadius: 40,
-            offset: Offset(0, 18),
-          ),
+              : AppColors.warmCream.withOpacity(0.95),
+          borderColor: isDark ? const Color(0x408FA2B5) : AppColors.deepBlue.withOpacity(0.12),
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(
@@ -104,7 +98,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                     ),
                     border: Border(
                       bottom: BorderSide(
-                        color: isDark ? const Color(0x22FFFFFF) : AppColors.borderLight,
+                        color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.12),
                         width: 0.8,
                       ),
                     ),
@@ -140,7 +134,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                             children: [
                               Text(
                                 item.name,
-                                style: AppTypography.title3.copyWith(
+                                style: AppTypography.heading.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: theme.primaryText,
                                 ),
@@ -148,7 +142,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                               const SizedBox(height: 2),
                               Text(
                                 "Base Price: ${item.displayPrice} • ${item.size}",
-                                style: AppTypography.footnote.copyWith(
+                                style: AppTypography.bodySmall.copyWith(
                                   color: theme.secondaryText,
                                 ),
                               ),
@@ -160,7 +154,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                         padding: EdgeInsets.zero,
                         minSize: 32,
                         borderRadius: BorderRadius.circular(16),
-                        color: isDark ? const Color(0x33FFFFFF) : AppColors.deepNavy.withOpacity(0.1),
+                        color: isDark ? const Color(0x33FFFFFF) : AppColors.deepBlue.withOpacity(0.1),
                         onPressed: () => Navigator.of(context).pop(),
                         child: Icon(
                           CupertinoIcons.xmark,
@@ -184,7 +178,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x22FFFFFF) : AppColors.primaryBlue.withOpacity(0.05),
+                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.all(3),
@@ -210,7 +204,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x22FFFFFF) : AppColors.primaryBlue.withOpacity(0.05),
+                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.all(3),
@@ -236,7 +230,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x22FFFFFF) : AppColors.primaryBlue.withOpacity(0.05),
+                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.all(3),
@@ -280,12 +274,12 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? AppColors.accentOrange.withOpacity(isDark ? 0.25 : 0.12)
-                                    : (isDark ? const Color(0x18FFFFFF) : AppColors.primaryBlue.withOpacity(0.04)),
+                                    : (isDark ? const Color(0x18FFFFFF) : AppColors.deepBlue.withOpacity(0.04)),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isSelected
                                       ? AppColors.accentOrange
-                                      : (isDark ? const Color(0x22FFFFFF) : AppColors.borderLight),
+                                      : (isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.12)),
                                   width: 1.0,
                                 ),
                               ),
@@ -304,7 +298,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                                       const SizedBox(width: 10),
                                       Text(
                                         entry.key,
-                                        style: AppTypography.footnote.copyWith(
+                                        style: AppTypography.bodySmall.copyWith(
                                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                                           color: isSelected ? theme.primaryText : theme.secondaryText,
                                         ),
@@ -395,7 +389,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
         const SizedBox(width: 6),
         Text(
           title,
-          style: AppTypography.caption2.copyWith(
+          style: AppTypography.eyebrow.copyWith(
             fontWeight: FontWeight.w800,
             color: AppColors.accentOrange,
             letterSpacing: 1.0,
@@ -415,8 +409,8 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
           fontSize: 12,
           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           color: isSelected
-              ? (isDark ? AppColors.accentOrange : AppColors.accentOrange)
-              : (isDark ? const Color(0xFF8FA2B5) : AppColors.textPrimary),
+              ? AppColors.accentOrange
+              : (isDark ? const Color(0xFF8FA2B5) : AppColors.textPrimaryDay),
           height: 1.25,
         ),
       ),

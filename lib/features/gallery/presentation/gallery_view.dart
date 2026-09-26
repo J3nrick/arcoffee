@@ -21,6 +21,7 @@ class GalleryView extends StatefulWidget {
 
 class _GalleryViewState extends State<GalleryView> {
   List<GalleryItem> _items = [];
+  final Set<String> _likedIds = {};
   bool _isLoading = true;
 
   @override
@@ -36,6 +37,17 @@ class _GalleryViewState extends State<GalleryView> {
       _items = items;
       _isLoading = false;
     });
+  }
+
+  void _toggleLike(String id) async {
+    setState(() {
+      if (_likedIds.contains(id)) {
+        _likedIds.remove(id);
+      } else {
+        _likedIds.add(id);
+      }
+    });
+    await widget.repository.toggleLike(id);
   }
 
   @override
@@ -63,110 +75,196 @@ class _GalleryViewState extends State<GalleryView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // Editorial Header Banner
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const ArcoSticker(text: "THE ARCOFFEE WALL", rotation: -0.02),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Community & Courtside Stories",
-                      style: AppTypography.display.copyWith(
-                        color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                        fontSize: isMobile ? 26 : 36,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const ArcoSticker(text: "THE ARCOFFEE WALL", rotation: -0.02),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Courtside Community Stories",
+                        style: AppTypography.display.copyWith(
+                          color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+                          fontSize: isMobile ? 26 : 36,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      "Good coffee, great rallies, and unforgettable midnight sessions at The Pickleground PH.",
-                      style: AppTypography.bodyLarge.copyWith(
-                        color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                      const SizedBox(height: 6),
+                      Text(
+                        "Good coffee, intense rallies, and round-the-clock weekend sessions at The Pickleground PH.",
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 36),
 
-            // Wall Grid Collage
+            // Wall Grid Polaroid Collage
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: isMobile ? 1 : (isTablet ? 2 : 3),
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-                childAspectRatio: 0.85,
+                crossAxisSpacing: 24,
+                mainAxisSpacing: 24,
+                childAspectRatio: isMobile ? 0.85 : 0.80,
               ),
               itemCount: _items.length,
               itemBuilder: (context, index) {
                 final item = _items[index];
-                final rotation = (index % 2 == 0) ? 0.015 : -0.015;
+                final isLiked = _likedIds.contains(item.id);
+                final rotation = (index % 3 == 0)
+                    ? 0.012
+                    : (index % 3 == 1)
+                        ? -0.015
+                        : 0.008;
 
                 return Transform.rotate(
                   angle: isMobile ? 0.0 : rotation,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.surfaceNightL2 : AppColors.surfaceDayL2,
+                      color: isDark ? AppColors.surfaceNightL2 : AppColors.pureWhite,
                       borderRadius: AppRadii.xl,
                       border: Border.all(
-                        color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.08),
+                        color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.08),
+                        width: 1.2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark ? const Color(0x40000000) : AppColors.deepBlue.withOpacity(0.06),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Image Container
+                        // Image Container Frame
                         Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: item.primaryColor.withOpacity(0.15),
-                              borderRadius: AppRadii.lg,
-                            ),
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  CupertinoIcons.photo,
-                                  size: 32,
-                                  color: item.primaryColor,
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      item.primaryColor.withOpacity(isDark ? 0.3 : 0.15),
+                                      item.secondaryColor.withOpacity(isDark ? 0.2 : 0.08),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: AppRadii.lg,
                                 ),
-                                const SizedBox(height: 8),
-                                ArcoSticker(text: item.category, rotation: 0.0),
-                              ],
-                            ),
+                                alignment: Alignment.center,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      item.icon,
+                                      size: 40,
+                                      color: item.primaryColor,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    ArcoSticker(
+                                      text: item.category.toUpperCase(),
+                                      rotation: 0.0,
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Top Right Timestamp Tag
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xCC07111D)
+                                        : AppColors.pureWhite.withOpacity(0.9),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    item.timestamp,
+                                    style: AppTypography.receipt.copyWith(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: isDark ? AppColors.textSecondaryNight : AppColors.deepBlue,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 14),
 
-                        // Title & Subtitle/Timestamp
+                        // Title
                         Text(
                           item.title,
                           style: AppTypography.headingSmall.copyWith(
                             color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
+
+                        // Subtitle Story Caption
+                        Text(
+                          item.subtitle,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Bottom Actions: Like count & Location tag
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              item.subtitle,
+                              "KAWIT, CAVITE",
                               style: AppTypography.receipt.copyWith(
                                 color: AppColors.accentOrange,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 11,
                               ),
                             ),
-                            Text(
-                              item.timestamp,
-                              style: AppTypography.receipt.copyWith(
-                                color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay,
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              minSize: 32,
+                              onPressed: () => _toggleLike(item.id),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isLiked ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                                    size: 16,
+                                    color: isLiked ? AppColors.accentOrange : (isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "${(int.tryParse(item.likesCount) ?? 100) + (isLiked ? 1 : 0)}",
+                                    style: AppTypography.receipt.copyWith(
+                                      color: isLiked ? AppColors.accentOrange : (isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
