@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import '../core/constants/app_colors.dart';
-import '../core/constants/app_typography.dart';
+import '../core/design/app_colors.dart';
+import '../core/design/app_typography.dart';
 
 /// Cupertino Theme configuration adhering strictly to Apple HIG principles,
 /// supporting both Day Court and Midnight Court palettes.
@@ -10,8 +10,8 @@ class AppTheme {
       brightness: Brightness.light,
       primaryColor: AppColors.accentOrange,
       primaryContrastingColor: AppColors.pureWhite,
-      scaffoldBackgroundColor: AppColors.creamBackground,
-      barBackgroundColor: AppColors.glassFill,
+      scaffoldBackgroundColor: AppColors.surfaceDayL1,
+      barBackgroundColor: AppColors.glassDay,
       textTheme: CupertinoTextThemeData(
         primaryColor: AppColors.accentOrange,
         textStyle: AppTypography.body,
@@ -25,19 +25,19 @@ class AppTheme {
           fontSize: 10,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.2,
-          color: AppColors.textSecondary,
+          color: AppColors.textSecondaryDay,
         ),
         navTitleTextStyle: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.4,
-          color: AppColors.textPrimary,
+          color: AppColors.deepBlue,
         ),
         navLargeTitleTextStyle: TextStyle(
           fontSize: 34,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.8,
-          color: AppColors.textPrimary,
+          color: AppColors.deepBlue,
         ),
       ),
     );
@@ -48,14 +48,14 @@ class AppTheme {
       brightness: Brightness.dark,
       primaryColor: AppColors.accentOrange,
       primaryContrastingColor: AppColors.pureWhite,
-      scaffoldBackgroundColor: Color(0xFF07111C),
-      barBackgroundColor: Color(0xCC0B1824),
+      scaffoldBackgroundColor: AppColors.surfaceNightL1,
+      barBackgroundColor: AppColors.glassNight,
       textTheme: CupertinoTextThemeData(
         primaryColor: AppColors.accentOrange,
         textStyle: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w400,
-          color: Color(0xFFFAF7F2),
+          color: AppColors.textPrimaryNight,
           letterSpacing: -0.4,
         ),
         actionTextStyle: TextStyle(
@@ -68,19 +68,19 @@ class AppTheme {
           fontSize: 10,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.2,
-          color: Color(0xFF8FA2B5),
+          color: AppColors.textSecondaryNight,
         ),
         navTitleTextStyle: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.4,
-          color: Color(0xFFFAF7F2),
+          color: AppColors.textPrimaryNight,
         ),
         navLargeTitleTextStyle: TextStyle(
           fontSize: 34,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.8,
-          color: Color(0xFFFAF7F2),
+          color: AppColors.textPrimaryNight,
         ),
       ),
     );

@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/constants/app_typography.dart';
-import '../../../core/utils/responsive.dart';
-import '../../../shared/widgets/badge_pill.dart';
-import '../../../shared/widgets/frosted_glass_container.dart';
-import '../../../shared/widgets/status_pill.dart';
+import '../../../core/design/app_breakpoints.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/design/app_motion.dart';
+import '../../../core/design/app_typography.dart';
+import '../../../shared/components/arco_button.dart';
+import '../../../shared/components/arco_court_line.dart';
+import '../../../shared/components/arco_metadata.dart';
+import '../../../shared/components/arco_sticker.dart';
 import '../../../theme/theme_controller.dart';
 
-/// Hero Section for Arcoffee: introduces the brand slogan, location, and court atmosphere.
-class HomeHeroSection extends StatelessWidget {
+/// Editorial Hero Section for Arcoffee ("Court-side coffee culture").
+/// Features bold display typography, court line geometry, integrated graphics, and calm entrance.
+class HomeHeroSection extends StatefulWidget {
   final VoidCallback onExploreMenu;
   final VoidCallback onViewLocation;
 
@@ -20,445 +23,283 @@ class HomeHeroSection extends StatelessWidget {
   });
 
   @override
+  State<HomeHeroSection> createState() => _HomeHeroSectionState();
+}
+
+class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
+  late final Animation<double> _fadeIn;
+  late final Animation<Offset> _slideUp;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: AppMotion.hero,
+    );
+
+    _fadeIn = CurvedAnimation(
+      parent: _animController,
+      curve: AppMotion.heroCurve,
+    );
+
+    _slideUp = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animController,
+      curve: AppMotion.heroCurve,
+    ));
+
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = ThemeScope.of(context);
-    final isDesktop = Responsive.isDesktop(context);
-    final horizontalPad = Responsive.horizontalPadding(context);
+    final isDark = theme.isMidnightCourt;
+    final isDesktop = AppBreakpoints.isDesktop(context);
+    final horizontalPad = AppBreakpoints.horizontalPadding(context);
+    final isReducedMotion = AppMotion.isReducedMotion(context);
 
-    return Container(
+    Widget content = Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPad,
-        vertical: isDesktop ? 48.0 : 28.0,
+        vertical: isDesktop ? 64.0 : 32.0,
       ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
-        child: isDesktop ? _buildDesktopHero(context, theme) : _buildMobileHero(context, theme),
+        constraints: const BoxConstraints(maxWidth: AppBreakpoints.desktopMax),
+        child: isDesktop
+            ? _buildDesktopComposition(theme, isDark)
+            : _buildMobileComposition(theme, isDark),
+      ),
+    );
+
+    if (isReducedMotion) return content;
+
+    return FadeTransition(
+      opacity: _fadeIn,
+      child: SlideTransition(
+        position: _slideUp,
+        child: content,
       ),
     );
   }
 
-  Widget _buildDesktopHero(BuildContext context, ThemeController theme) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Left Column: Main Typography & CTA
-        Expanded(
-          flex: 6,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Courtside Pill & Live Status
-              const Row(
-                children: [
-                  BadgePill(
-                    label: "THE PICKLEGROUND PH • KAWIT / NOVELETA",
-                    icon: CupertinoIcons.sportscourt_fill,
-                    backgroundColor: Color(0xFFF3ECE0),
-                    textColor: AppColors.primaryBlue,
-                  ),
-                  SizedBox(width: 10),
-                  StatusPill(
-                    text: "WEEKENDS 24 HOURS",
-                    isOpen: true,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Hero Title
-              RichText(
-                text: TextSpan(
-                  style: AppTypography.largeTitle.copyWith(
-                    fontSize: 48,
-                    height: 1.12,
-                    letterSpacing: -1.5,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: "Where Coffee Fuels the ",
-                      style: TextStyle(color: theme.primaryText),
-                    ),
-                    const TextSpan(
-                      text: "Court.",
-                      style: TextStyle(color: AppColors.accentOrange),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Slogan Callout
-              Text(
-                "\"${AppConstants.slogan}\"",
-                style: AppTypography.brandSlogan.copyWith(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Description
-              Text(
-                "Arcoffee brings high-octane community energy and specialty craft beverages right to the baseline of The Pickleground PH. From cold brew endurance to viral Haw-Haw Matcha and fizzy Italian sodas, every cup is crafted for winners.",
-                style: AppTypography.body.copyWith(
-                  color: theme.secondaryText,
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Action Buttons
-              Row(
-                children: [
-                  CupertinoButton.filled(
-                    borderRadius: BorderRadius.circular(16),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                    onPressed: onExploreMenu,
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(CupertinoIcons.sparkles, size: 16, color: AppColors.pureWhite),
-                        SizedBox(width: 8),
-                        Text(
-                          "Explore Menu Series",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            color: AppColors.pureWhite,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  CupertinoButton(
-                    borderRadius: BorderRadius.circular(16),
-                    color: theme.isMidnightCourt ? const Color(0x33FFFFFF) : AppColors.primaryBlue.withOpacity(0.08),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                    onPressed: onViewLocation,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(CupertinoIcons.location_solid, size: 16, color: theme.isMidnightCourt ? AppColors.accentOrange : AppColors.primaryBlue),
-                        const SizedBox(width: 8),
-                        Text(
-                          "Court Hours & Location",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                            color: theme.primaryText,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 48),
-
-        // Right Column: Apple HIG Frosted Showcase Graphic Card
-        Expanded(
-          flex: 5,
-          child: _buildShowcaseCard(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileHero(BuildContext context, ThemeController theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Wrap(
-          spacing: 8,
-          runSpacing: 8,
+  Widget _buildDesktopComposition(ThemeController theme, bool isDark) {
+    return ArcoCornerBracket(
+      size: 24,
+      strokeWidth: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            BadgePill(
-              label: "THE PICKLEGROUND PH",
-              icon: CupertinoIcons.sportscourt_fill,
-              backgroundColor: Color(0xFFF3ECE0),
-              textColor: AppColors.primaryBlue,
-              isSmall: true,
+            // Left Column: Editorial Headline & Actions
+            Expanded(
+              flex: 6,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const ArcoSticker(text: "THE PICKLEGROUND PH", rotation: -0.02),
+                      const SizedBox(width: 12),
+                      ArcoScoreboardMetadata(
+                        label: "HOURS",
+                        value: isDark ? "24H NIGHT SESSION" : "MON-THU 2-10PM | FRI-SUN 24H",
+                        isHighlight: isDark,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Display Headline
+                  Text(
+                    "COFFEE,\nCOURT-SIDE.",
+                    style: AppTypography.displayXL.copyWith(
+                      color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+                      fontSize: 64,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Text(
+                    "\"${AppConstants.slogan}\"",
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.accentOrange,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  Text(
+                    "Craft specialty coffee, non-coffee overloads & ice-cold sodas served directly alongside the pickleball courts in Kawit, Cavite.",
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Action Buttons
+                  Row(
+                    children: [
+                      ArcoButton(
+                        text: "Explore Menu",
+                        icon: CupertinoIcons.flame_fill,
+                        onPressed: widget.onExploreMenu,
+                        variant: ArcoButtonVariant.primary,
+                      ),
+                      const SizedBox(width: 16),
+                      ArcoButton(
+                        text: "Location & Hours",
+                        icon: CupertinoIcons.location_fill,
+                        onPressed: widget.onViewLocation,
+                        variant: ArcoButtonVariant.secondary,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            StatusPill(
-              text: "FRI-SUN 24 HOURS",
-              isOpen: true,
+            const SizedBox(width: 48),
+
+            // Right Column: Integrated Graphic Hero Display
+            Expanded(
+              flex: 5,
+              child: _buildHeroGraphicDisplay(theme, isDark),
             ),
           ],
         ),
-        const SizedBox(height: 18),
-        RichText(
-          text: TextSpan(
-            style: AppTypography.largeTitle.copyWith(
-              fontSize: 34,
-              height: 1.15,
-              letterSpacing: -1.0,
-            ),
-            children: [
-              TextSpan(
-                text: "Where Coffee Fuels the ",
-                style: TextStyle(color: theme.primaryText),
-              ),
-              const TextSpan(
-                text: "Court.",
-                style: TextStyle(color: AppColors.accentOrange),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
+      ),
+    );
+  }
+
+  Widget _buildMobileComposition(ThemeController theme, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const ArcoSticker(text: "COURT SIDE COFFEE", rotation: -0.02),
+        const SizedBox(height: 16),
         Text(
-          "\"${AppConstants.slogan}\"",
-          style: AppTypography.brandSlogan.copyWith(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+          "COFFEE,\nCOURT-SIDE.",
+          style: AppTypography.displayXL.copyWith(
+            color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+            fontSize: 42,
           ),
         ),
         const SizedBox(height: 12),
         Text(
-          "Cavite's premier courtside sanctuary. Serving handcrafted coffee, viral Haw-Haw Matcha, and sparkling craft sodas.",
-          style: AppTypography.callout.copyWith(
-            color: theme.secondaryText,
-            fontSize: 14,
+          "\"${AppConstants.slogan}\"",
+          style: AppTypography.body.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontStyle: FontStyle.italic,
+            color: AppColors.accentOrange,
           ),
         ),
+        const SizedBox(height: 20),
+        _buildHeroGraphicDisplay(theme, isDark, height: 220),
         const SizedBox(height: 24),
         Row(
           children: [
             Expanded(
-              child: CupertinoButton.filled(
-                borderRadius: BorderRadius.circular(14),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                onPressed: onExploreMenu,
-                child: const Text(
-                  "Explore Menu",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                    color: AppColors.pureWhite,
-                  ),
-                ),
+              child: ArcoButton(
+                text: "Explore Menu",
+                icon: CupertinoIcons.flame_fill,
+                onPressed: widget.onExploreMenu,
+                variant: ArcoButtonVariant.primary,
+                isFullWidth: true,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Expanded(
-              child: CupertinoButton(
-                borderRadius: BorderRadius.circular(14),
-                color: AppColors.primaryBlue.withOpacity(0.08),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                onPressed: onViewLocation,
-                child: const Text(
-                  "Hours & Loc",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: AppColors.primaryBlue,
-                  ),
-                ),
+              child: ArcoButton(
+                text: "Location",
+                icon: CupertinoIcons.location_fill,
+                onPressed: widget.onViewLocation,
+                variant: ArcoButtonVariant.secondary,
+                isFullWidth: true,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 28),
-        _buildShowcaseCard(),
       ],
     );
   }
 
-  Widget _buildShowcaseCard() {
-    return FrostedGlassContainer(
-      borderRadius: 24,
-      backgroundColor: AppColors.pureWhite.withOpacity(0.85),
-      borderColor: AppColors.borderLight,
-      padding: const EdgeInsets.all(24),
-      shadow: BoxShadow(
-        color: AppColors.primaryBlue.withOpacity(0.08),
-        blurRadius: 32,
-        offset: const Offset(0, 12),
+  Widget _buildHeroGraphicDisplay(ThemeController theme, bool isDark, {double height = 360}) {
+    return Container(
+      height: height,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F1D2B) : AppColors.softSand,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.12),
+          width: 1.2,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          // Graphic header
-          Container(
-            height: 180,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  AppColors.primaryBlue,
-                  Color(0xFF1E3A56),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Stack(
+          const Positioned(
+            top: 20,
+            left: 20,
+            child: ArcoCourtLine(width: 100, height: 1.0),
+          ),
+          const Positioned(
+            top: 20,
+            left: 20,
+            child: ArcoCourtLine(width: 1.0, height: 80, isVertical: true),
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Stylized Pickleball Court Courtlines
-                Positioned(
-                  left: 20,
-                  top: 0,
-                  bottom: 0,
-                  width: 2,
-                  child: Container(color: AppColors.pureWhite.withOpacity(0.2)),
-                ),
-                Positioned(
-                  right: 20,
-                  top: 0,
-                  bottom: 0,
-                  width: 2,
-                  child: Container(color: AppColors.pureWhite.withOpacity(0.2)),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 90,
-                  height: 2,
-                  child: Container(color: AppColors.courtOrange.withOpacity(0.5)),
-                ),
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.accentOrange,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.accentOrange.withOpacity(0.4),
-                              blurRadius: 18,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.sportscourt_fill,
-                          size: 32,
-                          color: AppColors.pureWhite,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        "THE PICKLEGROUND PH",
-                        style: TextStyle(
-                          color: AppColors.pureWhite,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Home of Arcoffee • Kawit / Noveleta",
-                        style: AppTypography.caption1.copyWith(
-                          color: AppColors.pureWhite.withOpacity(0.75),
-                        ),
+                Container(
+                  width: 84,
+                  height: 84,
+                  decoration: BoxDecoration(
+                    color: AppColors.accentOrange,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accentOrange.withOpacity(0.4),
+                        blurRadius: 28,
+                        offset: const Offset(0, 8),
                       ),
                     ],
                   ),
+                  child: const Icon(
+                    CupertinoIcons.circle_grid_hex_fill,
+                    size: 44,
+                    color: AppColors.pureWhite,
+                  ),
                 ),
+                const SizedBox(height: 16),
+                Text(
+                  "MILO OVERLOAD & EXPRESSO RUSH",
+                  style: AppTypography.scoreboard.copyWith(
+                    fontSize: 12,
+                    color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const ArcoSticker(text: "PLAY. SIP. REPEAT.", rotation: 0.02),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-
-          // Feature Grid Row inside Card
-          Row(
-            children: [
-              _buildFeatureMini(
-                CupertinoIcons.flame_fill,
-                "Espresso Craft",
-                "Spanish & Macchiato",
-                AppColors.warmCoffee,
-              ),
-              const SizedBox(width: 12),
-              _buildFeatureMini(
-                CupertinoIcons.leaf_arrow_circlepath,
-                "Haw-Haw Matcha",
-                "Viral Cavite Hit",
-                AppColors.matchaGreen,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _buildFeatureMini(
-                CupertinoIcons.burst_fill,
-                "Fizzy Sodas",
-                "Lychee & Lemon Yuzu",
-                AppColors.sodaBlue,
-              ),
-              const SizedBox(width: 12),
-              _buildFeatureMini(
-                CupertinoIcons.moon_stars_fill,
-                "24H Weekend",
-                "Fri - Sun All Night",
-                AppColors.accentOrange,
-              ),
-            ],
-          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFeatureMini(
-    IconData icon,
-    String title,
-    String subtitle,
-    Color color,
-  ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: color.withOpacity(0.18),
-            width: 0.8,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: color),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTypography.caption1.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryBlue,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    subtitle,
-                    style: AppTypography.caption2.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

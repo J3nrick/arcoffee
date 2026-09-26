@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../core/constants/app_typography.dart';
-import '../../../core/utils/responsive.dart';
+import '../../../core/design/app_breakpoints.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/design/app_radii.dart';
+import '../../../core/design/app_shadows.dart';
+import '../../../core/design/app_typography.dart';
 import '../../../data/models/store_info.dart';
 import '../../../data/repositories/store_repository.dart';
-import '../../../shared/widgets/frosted_glass_container.dart';
+import '../../../shared/components/arco_button.dart';
+import '../../../shared/components/arco_court_line.dart';
+import '../../../shared/components/arco_metadata.dart';
+import '../../../shared/components/arco_sticker.dart';
 import '../../../theme/theme_controller.dart';
 
-/// Clean, high-contrast Location & Operating Hours View.
-/// Features true Liquid Glass cards, bold Apple typography, and vibrant Arcoffee Orange accents.
+/// Branded Location & Operating Hours View for Arcoffee.
 class LocationView extends StatefulWidget {
   final StoreRepository repository;
 
@@ -21,6 +24,7 @@ class LocationView extends StatefulWidget {
 
 class _LocationViewState extends State<LocationView> {
   StoreInfo? _storeInfo;
+  bool _isOpenNow = true;
   bool _isLoading = true;
 
   @override
@@ -31,17 +35,19 @@ class _LocationViewState extends State<LocationView> {
 
   Future<void> _loadStoreData() async {
     final info = await widget.repository.getStoreInfo();
+    final isOpen = await widget.repository.isStoreOpenCurrently();
     if (!mounted) return;
     setState(() {
       _storeInfo = info;
+      _isOpenNow = isOpen;
       _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final horizontalPad = Responsive.horizontalPadding(context);
-    final isDesktop = Responsive.isDesktop(context);
+    final horizontalPad = AppBreakpoints.horizontalPadding(context);
+    final isDesktop = AppBreakpoints.isDesktop(context);
     final theme = ThemeScope.of(context);
     final isDark = theme.isMidnightCourt;
 
@@ -60,38 +66,44 @@ class _LocationViewState extends State<LocationView> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: horizontalPad, vertical: 36),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
+        constraints: const BoxConstraints(maxWidth: AppBreakpoints.desktopMax),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Bold Clean Header (No redundant badges)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Visit Arcoffee",
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.8,
-                    color: theme.primaryText,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const ArcoSticker(text: "THE PICKLEGROUND PH", rotation: -0.01),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Visit Arcoffee",
+                      style: AppTypography.display.copyWith(
+                        color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      "Located directly at The Pickleground PH in Kawit / Noveleta, Cavite.",
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  "The Pickleground PH • Kawit / Noveleta, Cavite",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.accentOrange,
-                    letterSpacing: -0.2,
-                  ),
+                ArcoScoreboardMetadata(
+                  label: "STATUS",
+                  value: _isOpenNow ? "OPEN NOW" : "CLOSED NOW",
+                  isHighlight: _isOpenNow,
                 ),
               ],
             ),
             const SizedBox(height: 32),
 
-            // Main Responsive Content Grid
+            // Grid Layout
             if (isDesktop)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,8 +124,6 @@ class _LocationViewState extends State<LocationView> {
               ),
 
             const SizedBox(height: 32),
-
-            // Amenities Section
             _buildAmenitiesSection(store, theme, isDark),
           ],
         ),
@@ -122,139 +132,77 @@ class _LocationViewState extends State<LocationView> {
   }
 
   Widget _buildHoursAndDetails(StoreInfo store, ThemeController theme, bool isDark) {
+    final cardBg = isDark ? AppColors.surfaceNightL2 : AppColors.surfaceDayL2;
+
     return Column(
       children: [
-        // Operating Hours Liquid Glass Card
-        FrostedGlassContainer(
-          borderRadius: 24,
-          blurSigma: 20.0,
-          backgroundColor: isDark
-              ? const Color(0xCC0E1A26)
-              : AppColors.pureWhite.withOpacity(0.85),
-          borderColor: isDark
-              ? const Color(0x338FA2B5)
-              : AppColors.pureWhite.withOpacity(0.6),
-          shadow: BoxShadow(
-            color: isDark ? const Color(0x66000000) : AppColors.primaryBlue.withOpacity(0.06),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
+        // Hours Card
+        Container(
           padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: AppRadii.xxl,
+            border: Border.all(
+              color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.08),
+            ),
+            boxShadow: AppShadows.cardShadow(isDark),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(
-                    CupertinoIcons.clock_fill,
-                    size: 22,
-                    color: AppColors.accentOrange,
-                  ),
+                  const Icon(CupertinoIcons.clock_fill, size: 20, color: AppColors.accentOrange),
                   const SizedBox(width: 10),
                   Text(
                     "Operating Hours",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: theme.primaryText,
-                      letterSpacing: -0.4,
+                    style: AppTypography.heading.copyWith(
+                      color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-
-              // Weekdays (Mon-Thu 2PM-10PM)
-              _buildScheduleRow(
-                dayTitle: "Monday – Thursday",
-                hours: "2:00 PM – 10:00 PM",
-                note: "Afternoon & Evening Court Sessions",
-                isHighlight: false,
-                theme: theme,
-                isDark: isDark,
-              ),
+              _buildScheduleRow("Monday – Thursday", "2:00 PM – 10:00 PM", "Afternoon & Evening Sessions", false, theme, isDark),
               const SizedBox(height: 12),
-
-              // Weekend 24 Hours (Fri-Sun)
-              _buildScheduleRow(
-                dayTitle: "Friday – Sunday",
-                hours: "24 Hours (Non-Stop)",
-                note: "Round-the-clock rallies, matches & caffeine",
-                isHighlight: true,
-                theme: theme,
-                isDark: isDark,
-              ),
+              _buildScheduleRow("Friday – Sunday", "24 Hours (Non-Stop)", "Round-the-clock rallies & caffeine", true, theme, isDark),
             ],
           ),
         ),
         const SizedBox(height: 20),
 
-        // Exact Address Liquid Glass Card
-        FrostedGlassContainer(
-          borderRadius: 24,
-          blurSigma: 20.0,
-          backgroundColor: isDark
-              ? const Color(0xCC0E1A26)
-              : AppColors.pureWhite.withOpacity(0.85),
-          borderColor: isDark
-              ? const Color(0x338FA2B5)
-              : AppColors.pureWhite.withOpacity(0.6),
-          shadow: BoxShadow(
-            color: isDark ? const Color(0x66000000) : AppColors.primaryBlue.withOpacity(0.06),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
+        // Address Card
+        Container(
           padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: AppRadii.xxl,
+            border: Border.all(
+              color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.08),
+            ),
+            boxShadow: AppShadows.cardShadow(isDark),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(
-                    CupertinoIcons.location_solid,
-                    size: 22,
-                    color: isDark ? AppColors.accentOrange : AppColors.primaryBlue,
-                  ),
+                  Icon(CupertinoIcons.location_solid, size: 20, color: isDark ? AppColors.accentOrange : AppColors.deepBlue),
                   const SizedBox(width: 10),
                   Text(
                     "Exact Address",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: theme.primaryText,
-                      letterSpacing: -0.4,
+                    style: AppTypography.heading.copyWith(
+                      color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              Text(
-                store.venue,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: theme.primaryText,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                "${store.address}, ${store.province}",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: theme.secondaryText,
-                  height: 1.4,
-                ),
-              ),
+              Text(store.venue, style: AppTypography.headingSmall.copyWith(color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue)),
+              const SizedBox(height: 4),
+              Text("${store.address}, ${store.province}", style: AppTypography.body.copyWith(color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay)),
               const SizedBox(height: 10),
-              Text(
-                "Landmark: Beside major Kawit/Noveleta transit corridors with direct Cavitex access.",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                  color: theme.tertiaryText,
-                ),
-              ),
+              Text("Landmark: Beside major Kawit/Noveleta transit corridors with direct Cavitex access.", style: AppTypography.receipt.copyWith(color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay)),
             ],
           ),
         ),
@@ -262,26 +210,16 @@ class _LocationViewState extends State<LocationView> {
     );
   }
 
-  Widget _buildScheduleRow({
-    required String dayTitle,
-    required String hours,
-    required String note,
-    required bool isHighlight,
-    required ThemeController theme,
-    required bool isDark,
-  }) {
+  Widget _buildScheduleRow(String dayTitle, String hours, String note, bool isHighlight, ThemeController theme, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isHighlight
             ? AppColors.accentOrange.withOpacity(isDark ? 0.18 : 0.08)
-            : (isDark ? const Color(0x22FFFFFF) : AppColors.primaryBlue.withOpacity(0.04)),
-        borderRadius: BorderRadius.circular(16),
+            : (isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.04)),
+        borderRadius: AppRadii.xl,
         border: Border.all(
-          color: isHighlight
-              ? AppColors.accentOrange.withOpacity(0.4)
-              : theme.borderLight,
-          width: 1.0,
+          color: isHighlight ? AppColors.accentOrange.withOpacity(0.4) : (isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.08)),
         ),
       ),
       child: Column(
@@ -290,111 +228,49 @@ class _LocationViewState extends State<LocationView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                dayTitle,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: theme.primaryText,
-                ),
-              ),
-              Text(
-                hours,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: isHighlight ? AppColors.accentOrange : theme.primaryText,
-                ),
-              ),
+              Text(dayTitle, style: AppTypography.headingSmall.copyWith(color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue)),
+              Text(hours, style: AppTypography.scoreboard.copyWith(color: isHighlight ? AppColors.accentOrange : (isDark ? AppColors.textPrimaryNight : AppColors.deepBlue))),
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            note,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-              color: theme.secondaryText,
-            ),
-          ),
+          Text(note, style: AppTypography.bodySmall.copyWith(color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay)),
         ],
       ),
     );
   }
 
   Widget _buildMapVisualCard(StoreInfo store, ThemeController theme, bool isDark) {
-    return FrostedGlassContainer(
-      borderRadius: 24,
-      blurSigma: 20.0,
-      backgroundColor: isDark
-          ? const Color(0xCC0E1A26)
-          : AppColors.pureWhite.withOpacity(0.85),
-      borderColor: isDark
-          ? const Color(0x338FA2B5)
-          : AppColors.pureWhite.withOpacity(0.6),
-      shadow: BoxShadow(
-        color: isDark ? const Color(0x66000000) : AppColors.primaryBlue.withOpacity(0.06),
-        blurRadius: 24,
-        offset: const Offset(0, 8),
-      ),
+    final cardBg = isDark ? AppColors.surfaceNightL2 : AppColors.surfaceDayL2;
+
+    return Container(
       padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: AppRadii.xxl,
+        border: Border.all(color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.08)),
+        boxShadow: AppShadows.cardShadow(isDark),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
-                CupertinoIcons.map_fill,
-                size: 22,
-                color: AppColors.sodaBlue,
-              ),
+              const Icon(CupertinoIcons.map_fill, size: 20, color: AppColors.accentOrange),
               const SizedBox(width: 10),
-              Text(
-                "Courtside Map Locator",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: theme.primaryText,
-                  letterSpacing: -0.4,
-                ),
-              ),
+              Text("Courtside Map Locator", style: AppTypography.heading.copyWith(color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue)),
             ],
           ),
           const SizedBox(height: 18),
-
-          // Vector Map Representation
           Container(
             height: 200,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0A141F) : const Color(0xFFE8ECEF),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: theme.borderLight,
-                width: 1.0,
-              ),
+              color: isDark ? const Color(0xFF0A141F) : AppColors.softSand,
+              borderRadius: AppRadii.xl,
+              border: Border.all(color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.1)),
             ),
             child: Stack(
               children: [
-                // Simulated roads
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 100,
-                  height: 20,
-                  child: Container(
-                    color: isDark ? const Color(0xFF142434) : AppColors.pureWhite,
-                  ),
-                ),
-                Positioned(
-                  left: 150,
-                  top: 0,
-                  bottom: 0,
-                  width: 20,
-                  child: Container(
-                    color: isDark ? const Color(0xFF142434) : AppColors.pureWhite,
-                  ),
-                ),
-                // Arcoffee Location Pin
+                const Positioned(top: 20, left: 20, child: ArcoCourtLine(width: 120)),
                 Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -403,38 +279,19 @@ class _LocationViewState extends State<LocationView> {
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: AppColors.accentOrange,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.accentOrange.withOpacity(0.4),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          borderRadius: AppRadii.lg,
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(CupertinoIcons.circle_grid_hex_fill, size: 14, color: AppColors.pureWhite),
                             SizedBox(width: 6),
-                            Text(
-                              "ARCOFFEE",
-                              style: TextStyle(
-                                color: AppColors.pureWhite,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 12,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
+                            Text("ARCOFFEE", style: TextStyle(color: AppColors.pureWhite, fontWeight: FontWeight.w800, fontSize: 12)),
                           ],
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Icon(
-                        CupertinoIcons.location_solid,
-                        size: 28,
-                        color: AppColors.accentOrange,
-                      ),
+                      const Icon(CupertinoIcons.location_solid, size: 28, color: AppColors.accentOrange),
                     ],
                   ),
                 ),
@@ -442,30 +299,12 @@ class _LocationViewState extends State<LocationView> {
             ),
           ),
           const SizedBox(height: 20),
-
-          // Get Directions CTA Button
-          CupertinoButton(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            borderRadius: BorderRadius.circular(16),
-            color: isDark ? AppColors.accentOrange : AppColors.primaryBlue,
+          ArcoButton(
+            text: "Get Directions (Waze / Google Maps)",
+            icon: CupertinoIcons.arrow_turn_up_right,
             onPressed: () {},
-            child: const Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(CupertinoIcons.arrow_turn_up_right, size: 16, color: AppColors.pureWhite),
-                  SizedBox(width: 8),
-                  Text(
-                    "Get Directions via Waze / Google Maps",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.pureWhite,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            variant: ArcoButtonVariant.primary,
+            isFullWidth: true,
           ),
         ],
       ),
@@ -473,41 +312,24 @@ class _LocationViewState extends State<LocationView> {
   }
 
   Widget _buildAmenitiesSection(StoreInfo store, ThemeController theme, bool isDark) {
-    return FrostedGlassContainer(
-      borderRadius: 24,
-      blurSigma: 20.0,
-      backgroundColor: isDark
-          ? const Color(0xCC0E1A26)
-          : AppColors.pureWhite.withOpacity(0.85),
-      borderColor: isDark
-          ? const Color(0x338FA2B5)
-          : AppColors.pureWhite.withOpacity(0.6),
-      shadow: BoxShadow(
-        color: isDark ? const Color(0x66000000) : AppColors.primaryBlue.withOpacity(0.06),
-        blurRadius: 24,
-        offset: const Offset(0, 8),
-      ),
+    final cardBg = isDark ? AppColors.surfaceNightL2 : AppColors.surfaceDayL2;
+
+    return Container(
       padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: AppRadii.xxl,
+        border: Border.all(color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.08)),
+        boxShadow: AppShadows.cardShadow(isDark),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
-                CupertinoIcons.sparkles,
-                size: 22,
-                color: AppColors.accentOrange,
-              ),
+              const Icon(CupertinoIcons.sparkles, size: 20, color: AppColors.accentOrange),
               const SizedBox(width: 10),
-              Text(
-                "Courtside Facility Highlights & Amenities",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: theme.primaryText,
-                  letterSpacing: -0.4,
-                ),
-              ),
+              Text("Facility Highlights & Amenities", style: AppTypography.heading.copyWith(color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue)),
             ],
           ),
           const SizedBox(height: 18),
@@ -515,38 +337,7 @@ class _LocationViewState extends State<LocationView> {
             spacing: 12,
             runSpacing: 12,
             children: store.courtAmenities.map((amenity) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0x22FFFFFF)
-                      : AppColors.primaryBlue.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: theme.borderLight,
-                    width: 0.8,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      CupertinoIcons.check_mark_circled_solid,
-                      size: 15,
-                      color: AppColors.statusOpen,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      amenity,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: theme.primaryText,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              );
+              return ArcoScoreboardMetadata(label: "AMENITY", value: amenity);
             }).toList(),
           ),
         ],
