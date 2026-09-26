@@ -61,15 +61,28 @@
       -webkit-user-select: none;
     }
     #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999999;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      width: 100vw;
       background: var(--brand-cream);
       color: var(--brand-blue);
-      transition: opacity 0.4s ease;
+      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s ease;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      cursor: default;
+    }
+    #loading.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
     .brand-logo-img {
       height: 48px;
@@ -114,6 +127,59 @@
     <div class="logo-text">ARCOFFEE</div>
     <div class="slogan-text">"It's always been ours."</div>
   </div>
+
+  <script>
+    (function () {
+      var startTime = Date.now();
+      var isDismissed = false;
+      var MAX_SPLASH_TIME = 3000; // Strict 3 seconds maximum display time
+
+      function dismissSplash() {
+        if (isDismissed) return;
+        isDismissed = true;
+
+        var loader = document.getElementById('loading');
+        if (loader) {
+          loader.classList.add('fade-out');
+          setTimeout(function () {
+            if (loader && loader.parentNode) {
+              loader.parentNode.removeChild(loader);
+            }
+          }, 500);
+        }
+      }
+
+      // Allow user to tap/click to dismiss immediately if eager
+      var loaderEl = document.getElementById('loading');
+      if (loaderEl) {
+        loaderEl.addEventListener('click', dismissSplash);
+      }
+
+      // 1. Listen for Flutter engine first-frame paint
+      window.addEventListener('flutter-first-frame', function () {
+        var elapsed = Date.now() - startTime;
+        var remaining = Math.max(0, MAX_SPLASH_TIME - elapsed);
+        setTimeout(dismissSplash, remaining);
+      });
+
+      // 2. Fallback DOM observer in case flutter-first-frame already fired
+      var observer = new MutationObserver(function (mutations, obs) {
+        if (document.querySelector('flutter-view') || document.querySelector('flt-glass-pane')) {
+          try { obs.disconnect(); } catch (e) {}
+          var elapsed = Date.now() - startTime;
+          var remaining = Math.max(0, MAX_SPLASH_TIME - elapsed);
+          setTimeout(dismissSplash, remaining);
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      // 3. Strict 3-second hard timeout: splash screen will NEVER stay longer than 3 seconds
+      setTimeout(function () {
+        dismissSplash();
+        try { observer.disconnect(); } catch (e) {}
+      }, MAX_SPLASH_TIME);
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
