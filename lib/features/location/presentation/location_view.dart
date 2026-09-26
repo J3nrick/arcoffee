@@ -7,6 +7,7 @@ import '../../../data/models/store_info.dart';
 import '../../../data/repositories/store_repository.dart';
 import '../../../shared/components/arco_button.dart';
 import '../../../shared/components/arco_court_line.dart';
+import '../../../shared/components/arco_logo.dart';
 import '../../../theme/theme_controller.dart';
 
 /// Editorial Location & Operating Hours Section for Arcoffee.
@@ -302,6 +303,23 @@ class _LocationViewState extends State<LocationView> {
                       AppColors.deepBlue.withOpacity(0.0),
                     ],
                   ),
+                ),
+              ),
+            ),
+            // Top Right Official Logo Brand Mark
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xCC07111D) : AppColors.deepBlue.withOpacity(0.85),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const ArcoLogo(
+                  height: 16,
+                  showText: false,
+                  color: AppColors.pureWhite,
                 ),
               ),
             ),

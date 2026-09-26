@@ -33,18 +33,20 @@
   <meta name="twitter:description" content="Arcoffee at The Pickleground PH. Open 24 Hours on weekends. Grab our signature Sodas, Matchas, and Coffee.">
   <meta name="twitter:image" content="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200&q=80">
   
-  <!-- Web Manifest & SVG Favicon -->
+  <!-- Web Manifest & Favicons -->
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230F2537'/><text x='50%' y='62%' text-anchor='middle' font-family='-apple-system, sans-serif' font-weight='900' font-size='52' fill='%23FAF7F2'>ar</text><circle cx='80' cy='24' r='10' fill='%23FF6600'/></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230F2537'/><text x='50%' y='62%' text-anchor='middle' font-family='-apple-system, sans-serif' font-weight='900' font-size='52' fill='%23FAF7F2'>ar</text><circle cx='80' cy='24' r='10' fill='%23FF6600'/></svg>">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="shortcut icon" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
 
   <style>
     :root {
-      --brand-blue: #0F2537;
-      --brand-orange: #FF6600;
-      --brand-cream: #FAF7F2;
+      --brand-blue: #0B1F33;
+      --brand-orange: #F36B21;
+      --brand-cream: #F6F1E7;
     }
     * {
       box-sizing: border-box;
@@ -69,37 +71,18 @@
       color: var(--brand-blue);
       transition: opacity 0.4s ease;
     }
-    .brand-mark {
-      width: 68px;
-      height: 68px;
-      background: var(--brand-blue);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--brand-cream);
-      font-size: 34px;
-      font-weight: 900;
-      letter-spacing: -1.5px;
-      box-shadow: 0 12px 30px rgba(15, 37, 55, 0.18);
-      position: relative;
-    }
-    .brand-mark::after {
-      content: '';
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 14px;
-      height: 14px;
-      background: var(--brand-orange);
-      border-radius: 50%;
-      border: 2.5px solid var(--brand-cream);
+    .brand-logo-img {
+      height: 48px;
+      width: auto;
+      max-width: 140px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 16px rgba(11, 31, 51, 0.12));
     }
     .spinner {
-      margin-top: 28px;
-      width: 38px;
-      height: 38px;
-      border: 3.5px solid rgba(15, 37, 55, 0.1);
+      margin-top: 24px;
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(11, 31, 51, 0.1);
       border-radius: 50%;
       border-top-color: var(--brand-orange);
       animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -108,25 +91,25 @@
       to { transform: rotate(360deg); }
     }
     .logo-text {
-      margin-top: 20px;
-      font-size: 24px;
-      font-weight: 800;
+      margin-top: 18px;
+      font-size: 22px;
+      font-weight: 900;
       letter-spacing: -0.5px;
       color: var(--brand-blue);
     }
     .slogan-text {
-      margin-top: 6px;
+      margin-top: 4px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--brand-orange);
-      letter-spacing: 0.2px;
+      letter-spacing: 0.5px;
       font-style: italic;
     }
   </style>
 </head>
 <body>
   <div id="loading">
-    <div class="brand-mark">ar</div>
+    <img src="logo.png" alt="ARCOFFEE Logo" class="brand-logo-img" />
     <div class="spinner"></div>
     <div class="logo-text">ARCOFFEE</div>
     <div class="slogan-text">"It's always been ours."</div>

@@ -8,6 +8,7 @@ import '../../core/design/app_radii.dart';
 import '../../core/design/app_typography.dart';
 import '../../theme/theme_controller.dart';
 import 'arco_button.dart';
+import 'arco_logo.dart';
 
 /// Floating Centered Liquid Glass Navigation Bar for Arcoffee.
 class ArcoNavigation extends StatelessWidget {
@@ -67,7 +68,7 @@ class ArcoNavigation extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Brand Logo
-                  _buildBrandLogo(theme, isDark),
+                  _buildBrandLogo(theme, isDark, isMobile),
 
                   // Center Nav Items
                   if (!isMobile) _buildDesktopNavItems(theme, isDark),
@@ -96,59 +97,12 @@ class ArcoNavigation extends StatelessWidget {
     );
   }
 
-  Widget _buildBrandLogo(ThemeController theme, bool isDark) {
-    return GestureDetector(
+  Widget _buildBrandLogo(ThemeController theme, bool isDark, bool isMobile) {
+    return ArcoLogo(
+      height: isMobile ? 24 : 28,
+      showText: true,
+      showSlogan: !isMobile,
       onTap: () => onTabSelected(0),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
-                borderRadius: AppRadii.md,
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                "ar",
-                style: TextStyle(
-                  color: AppColors.pureWhite,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -1.0,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "ARCOFFEE",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                    color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                  ),
-                ),
-                Text(
-                  AppConstants.slogan,
-                  style: AppTypography.eyebrow.copyWith(
-                    fontSize: 9,
-                    color: AppColors.accentOrange,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 

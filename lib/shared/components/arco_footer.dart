@@ -5,6 +5,7 @@ import '../../core/design/app_colors.dart';
 import '../../core/design/app_typography.dart';
 import '../../theme/theme_controller.dart';
 import 'arco_court_line.dart';
+import 'arco_logo.dart';
 
 /// Minimal Editorial Brand Footer for Arcoffee.
 /// Matches the blueprint: Large typography, slogan, and category pillars.
@@ -37,11 +38,19 @@ class ArcoFooter extends StatelessWidget {
             ),
             const SizedBox(height: 48),
 
+            // Official Logo Mark & Editorial Colophon
+            ArcoLogo(
+              height: isDesktop ? 48 : 38,
+              showText: false,
+              onTap: () => onNavigate?.call(0),
+            ),
+            const SizedBox(height: 18),
+
             // Large Center Editorial Brand Statement
             Text(
               "ARCOFFEE",
               style: AppTypography.displayXL.copyWith(
-                fontSize: isDesktop ? 44 : 32,
+                fontSize: isDesktop ? 40 : 30,
                 fontWeight: FontWeight.w900,
                 letterSpacing: -1.2,
                 color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,

@@ -8,6 +8,7 @@ import '../../../core/design/app_typography.dart';
 import '../../../core/utils/image_precacher.dart';
 import '../../../shared/components/arco_button.dart';
 import '../../../shared/components/arco_court_line.dart';
+import '../../../shared/components/arco_logo.dart';
 import '../../../theme/theme_controller.dart';
 
 /// Editorial Asymmetrical Hero Section for Arcoffee.
@@ -111,19 +112,29 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Brand Monospaced Metadata
-              Text(
-                "AR / 001   |   THE PICKLEGROUND PH",
-                style: AppTypography.scoreboard.copyWith(
-                  fontSize: 12,
-                  letterSpacing: 1.5,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
-                ),
+              // Brand Monospaced Metadata & Logo Mark
+              Row(
+                children: [
+                  ArcoLogo(
+                    height: 20,
+                    showText: false,
+                    color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    "AR / 001   |   THE PICKLEGROUND PH",
+                    style: AppTypography.scoreboard.copyWith(
+                      fontSize: 12,
+                      letterSpacing: 1.5,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               ArcoCourtLine(
-                width: 220,
+                width: 240,
                 height: 1.2,
                 color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
               ),
@@ -201,15 +212,25 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Brand Monospaced Metadata
-        Text(
-          "AR / 001   |   THE PICKLEGROUND PH",
-          style: AppTypography.scoreboard.copyWith(
-            fontSize: 11,
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.w700,
-            color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
-          ),
+        // Brand Monospaced Metadata & Logo Mark
+        Row(
+          children: [
+            ArcoLogo(
+              height: 18,
+              showText: false,
+              color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              "AR / 001   |   THE PICKLEGROUND PH",
+              style: AppTypography.scoreboard.copyWith(
+                fontSize: 11,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         ArcoCourtLine(
@@ -374,6 +395,12 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    const ArcoLogo(
+                      height: 18,
+                      showText: false,
+                      color: AppColors.pureWhite,
+                    ),
+                    const SizedBox(height: 6),
                     Text(
                       "PLAY.",
                       style: AppTypography.scoreboard.copyWith(
