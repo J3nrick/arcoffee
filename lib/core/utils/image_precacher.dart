@@ -5,23 +5,27 @@ import '../design/app_colors.dart';
 /// Pre-caching service to load high-priority visual assets before the first paint,
 /// preventing layout shift and visual pop-in.
 class ImagePrecacher {
-  /// Priority images to preload on app startup
-  static final List<String> priorityImageUrls = [
-    // Hero & Editorial Assets
-    'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=1200&q=85', // Hero Iced Coffee on Outdoor Surface
-    'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=1000&q=85', // Milo Overload / Signature Malt Coffee
-    'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&q=80',  // Haw-Haw Matcha
-    'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&q=80',  // Cold Brew & Espresso Shot
-    'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',  // Community Cafe & Court Atmosphere
-    'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80',  // Night Coffee Session
+  /// Priority local asset images to preload on app startup
+  static const List<String> priorityAssetPaths = [
+    'assets/images/milo_overload_court.png',
+    'assets/images/mango_americano_counter.jpg',
+    'assets/images/court_arena_drink.jpg',
+    'assets/images/community_milo_jersey.jpg',
+    'assets/images/lychee_soda_chat_paddle.jpg',
+    'assets/images/green_apple_court_line.jpg',
+    'assets/images/portafilter_tamp.jpg',
+    'assets/images/latte_pull_portrait.png',
+    'assets/images/spanish_latte_mascot.jpg',
+    'assets/images/matcha_pour.png',
+    'assets/images/soda_series_studio.png',
   ];
 
   static Future<void> precacheCoreAssets(BuildContext context) async {
-    for (final url in priorityImageUrls) {
+    for (final assetPath in priorityAssetPaths) {
       try {
-        await precacheImage(CachedNetworkImageProvider(url), context);
+        await precacheImage(AssetImage(assetPath), context);
       } catch (_) {
-        // Silently continue if network is slow or offline
+        // Silently continue if asset loading is interrupted
       }
     }
   }

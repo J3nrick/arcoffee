@@ -26,22 +26,40 @@ class _GalleryViewState extends State<GalleryView> {
   // Curated photographic lifestyle assets representing court, coffee, community
   static const List<Map<String, String>> _editorialPhotos = [
     {
-      'url': 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&q=80',
+      'asset': 'assets/images/court_arena_drink.jpg',
       'title': 'COURT ACTION',
-      'caption': 'SATURDAY / 08:42 PM',
-      'story': 'Full court lighting during our 24-hour weekend session at The Pickleground.',
+      'caption': 'THE PICKLEGROUND ARENA',
+      'story': 'Full court lighting during our 24-hour weekend session at The Pickleground, Kawit, Cavite.',
     },
     {
-      'url': 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',
+      'asset': 'assets/images/community_milo_jersey.jpg',
       'title': 'COMMUNITY',
       'caption': 'GOOD COFFEE. GOOD PEOPLE.',
-      'story': 'Post-match debrief with cold brews, sparklers, and local players.',
+      'story': 'Post-match debrief with cold brews, Milo Overload, and local players courtside.',
     },
     {
-      'url': 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80',
-      'title': 'NIGHT VIBE',
-      'caption': 'KAWIT, CAVITE',
-      'story': 'The rallies don\'t stop when the sun sets. Midnight coffee bar open all weekend.',
+      'asset': 'assets/images/lychee_soda_chat_paddle.jpg',
+      'title': 'COURTSIDE BANTER',
+      'caption': 'JOOLA PADDLE & LYCHEE SODA',
+      'story': 'Laro pickleball! Ano?? Tara?? Fast rallies, paddle drops, and sparkling refreshers.',
+    },
+    {
+      'asset': 'assets/images/portafilter_tamp.jpg',
+      'title': 'BARISTA CRAFT',
+      'caption': 'SHOT??? DOUBLE EXTRACTION',
+      'story': 'Precision-tamped espresso shots pulled on our commercial chrome grouphead.',
+    },
+    {
+      'asset': 'assets/images/green_apple_court_line.jpg',
+      'title': 'BASELINE REFRESH',
+      'caption': 'GREEN APPLE SPARKLER',
+      'story': 'Zero-heat sparkling sodas resting right on the pickleball court baseline.',
+    },
+    {
+      'asset': 'assets/images/latte_pull_portrait.png',
+      'title': 'SIGNATURE POUR',
+      'caption': 'ICED LATTE CRAFT',
+      'story': 'Velvety espresso pouring straight over rich chilled milk on the bar counter.',
     },
   ];
 
@@ -125,44 +143,81 @@ class _GalleryViewState extends State<GalleryView> {
     );
   }
 
-  /// Desktop Asymmetrical Collage with Varied Margin Offsets
+  /// Desktop Asymmetrical Collage with Varied Margin Offsets across 2 dynamic rows
   Widget _buildDesktopEditorialCollage(bool isDark) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
       children: [
-        // Photo 1: Large Court Action (Offset Top: 0)
-        Expanded(
-          flex: 4,
-          child: _buildCollageTile(
-            photo: _editorialPhotos[0],
-            isDark: isDark,
-            height: 380,
-            topOffset: 0,
-          ),
+        // Row 1
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 4,
+              child: _buildCollageTile(
+                photo: _editorialPhotos[0],
+                isDark: isDark,
+                height: 380,
+                topOffset: 0,
+              ),
+            ),
+            const SizedBox(width: 28),
+            Expanded(
+              flex: 3,
+              child: _buildCollageTile(
+                photo: _editorialPhotos[1],
+                isDark: isDark,
+                height: 320,
+                topOffset: 48,
+              ),
+            ),
+            const SizedBox(width: 28),
+            Expanded(
+              flex: 4,
+              child: _buildCollageTile(
+                photo: _editorialPhotos[2],
+                isDark: isDark,
+                height: 360,
+                topOffset: 20,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 28),
+        const SizedBox(height: 48),
 
-        // Photo 2: Lifestyle Candid (Offset Top: 54px for scrapbooked editorial rhythm)
-        Expanded(
-          flex: 3,
-          child: _buildCollageTile(
-            photo: _editorialPhotos[1],
-            isDark: isDark,
-            height: 320,
-            topOffset: 54,
-          ),
-        ),
-        const SizedBox(width: 28),
-
-        // Photo 3: Nighttime Vibe (Offset Top: 24px)
-        Expanded(
-          flex: 4,
-          child: _buildCollageTile(
-            photo: _editorialPhotos[2],
-            isDark: isDark,
-            height: 360,
-            topOffset: 24,
-          ),
+        // Row 2
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: _buildCollageTile(
+                photo: _editorialPhotos[3],
+                isDark: isDark,
+                height: 340,
+                topOffset: 24,
+              ),
+            ),
+            const SizedBox(width: 28),
+            Expanded(
+              flex: 4,
+              child: _buildCollageTile(
+                photo: _editorialPhotos[4],
+                isDark: isDark,
+                height: 380,
+                topOffset: 0,
+              ),
+            ),
+            const SizedBox(width: 28),
+            Expanded(
+              flex: 4,
+              child: _buildCollageTile(
+                photo: _editorialPhotos[5],
+                isDark: isDark,
+                height: 350,
+                topOffset: 40,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -217,11 +272,16 @@ class _GalleryViewState extends State<GalleryView> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: ArcoffeeNetworkImage(
-                imageUrl: photo['url']!,
-                fit: BoxFit.cover,
-                borderRadius: 16,
-              ),
+              child: photo['asset'] != null
+                  ? Image.asset(
+                      photo['asset']!,
+                      fit: BoxFit.cover,
+                    )
+                  : ArcoffeeNetworkImage(
+                      imageUrl: photo['url'] ?? '',
+                      fit: BoxFit.cover,
+                      borderRadius: 16,
+                    ),
             ),
           ),
           const SizedBox(height: 14),

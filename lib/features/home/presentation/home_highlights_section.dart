@@ -22,9 +22,9 @@ class HomeHighlightsSection extends StatelessWidget {
     required this.onExploreFullMenu,
   });
 
-  // Flagship drink imagery: Rich malt Milo overload with thick crema and espresso shot
-  static const String _flagshipImageUrl =
-      'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=1000&q=85';
+  // Flagship drink imagery default asset
+  static const String _flagshipDefaultAsset =
+      'assets/images/mango_americano_counter.jpg';
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +33,23 @@ class HomeHighlightsSection extends StatelessWidget {
     final isDesktop = AppBreakpoints.isDesktop(context);
     final horizontalPad = AppBreakpoints.horizontalPadding(context);
 
-    // Identify flagship drink or fallback to first item
+    // Identify flagship drink (Mango Americano or Milo Overload)
     final flagshipItem = featuredItems.firstWhere(
-      (item) => item.name.toLowerCase().contains('milo') || item.isBestseller,
-      orElse: () => featuredItems.isNotEmpty
-          ? featuredItems.first
-          : const MenuItem(
-              id: 'flagship',
-              name: 'Milo Overload & Espresso Rush',
-              description: 'Rich Milo malt overload paired with a double shot of signature espresso and thick cream.',
-              category: MenuCategory.nonCoffee,
-              price: 160.0,
-            ),
+      (item) => item.name.toLowerCase().contains('mango'),
+      orElse: () => featuredItems.firstWhere(
+        (item) => item.name.toLowerCase().contains('milo'),
+        orElse: () => featuredItems.isNotEmpty
+            ? featuredItems.first
+            : const MenuItem(
+                id: 'flagship',
+                name: 'Mango Americano',
+                description: 'Our viral courtside specialty! Sweet golden mango fruit base crowned with a floating double espresso shot.',
+                category: MenuCategory.coffee,
+                price: 140.0,
+                formattedPrice: '₱140',
+                imageAsset: 'assets/images/mango_americano_counter.jpg',
+              ),
+      ),
     );
 
     // Supporting drinks (exclude flagship to avoid repetition)
@@ -157,10 +162,9 @@ class HomeHighlightsSection extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const ArcoffeeNetworkImage(
-                    imageUrl: _flagshipImageUrl,
+                  Image.asset(
+                    item.imageAsset ?? _flagshipDefaultAsset,
                     fit: BoxFit.cover,
-                    borderRadius: 0,
                   ),
                   Positioned(
                     top: 16,
@@ -281,7 +285,19 @@ class HomeHighlightsSection extends StatelessWidget {
                         color: AppColors.accentOrange,
                       ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 16),
+                    if (item.imageAsset != null) ...[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          item.imageAsset!,
+                          width: 52,
+                          height: 52,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
 
                     // Drink Details
                     Expanded(

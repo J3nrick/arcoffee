@@ -35,9 +35,10 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
 
   final Map<String, double> _addonsList = {
     'Extra Espresso Shot': 30.0,
-    'Oat Milk Upgrade': 35.0,
+    'Substitute Oat Milk': 40.0,
+    'Sweetened Milk': 15.0,
     'Haw-Haw Sweet Cold Foam': 40.0,
-    'Malt Crunch / Powder Overload': 25.0,
+    'Malt Powder Overload': 25.0,
   };
 
   double get _currentTotalPrice {
@@ -109,8 +110,8 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                       Row(
                         children: [
                           Container(
-                            width: 44,
-                            height: 44,
+                            width: 48,
+                            height: 48,
                             decoration: BoxDecoration(
                               color: AppColors.pureWhite,
                               shape: BoxShape.circle,
@@ -122,10 +123,17 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                                 ),
                               ],
                             ),
-                            child: Icon(
-                              item.category.icon,
-                              color: item.accentColor,
-                              size: 24,
+                            child: ClipOval(
+                              child: item.imageAsset != null
+                                  ? Image.asset(
+                                      item.imageAsset!,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Icon(
+                                      item.category.icon,
+                                      color: item.accentColor,
+                                      size: 24,
+                                    ),
                             ),
                           ),
                           const SizedBox(width: 14),

@@ -94,7 +94,20 @@ class ArcoFooter extends StatelessWidget {
                 _buildFooterLink("LOCATION", 3, isDark),
               ],
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 24),
+
+            // Official Social Handles from Printed Menu Board
+            Wrap(
+              spacing: 16,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: [
+                _buildSocialBadge("IG", "@arcoffeeph", isDark),
+                _buildSocialBadge("FB", "@ARCoffee", isDark),
+                _buildSocialBadge("TIKTOK", "@arcoffeeph", isDark),
+              ],
+            ),
+            const SizedBox(height: 36),
 
             ArcoCourtLine(
               width: 160,
@@ -133,6 +146,38 @@ class ArcoFooter extends StatelessWidget {
             color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSocialBadge(String platform, String handle, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "$platform  ",
+            style: AppTypography.scoreboard.copyWith(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.8,
+              color: AppColors.accentOrange,
+            ),
+          ),
+          Text(
+            handle,
+            style: AppTypography.receipt.copyWith(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColors.textSecondaryNight : AppColors.deepBlue,
+            ),
+          ),
+        ],
       ),
     );
   }

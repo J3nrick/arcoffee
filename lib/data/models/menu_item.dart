@@ -57,13 +57,19 @@ class MenuItem {
   final MenuCategory category;
   final double price;
   final String formattedPrice;
+  final double? hotPrice;
+  final double? icedPrice;
+  final double? price16oz;
+  final double? price22oz;
   final bool isBestseller;
   final bool isCourtFavorite;
+  final bool isSignature;
   final bool isNew;
   final List<String> tags;
   final Color accentColor;
   final String size;
   final String caffeineNote;
+  final String? imageAsset;
 
   const MenuItem({
     required this.id,
@@ -72,19 +78,33 @@ class MenuItem {
     required this.category,
     required this.price,
     this.formattedPrice = '',
+    this.hotPrice,
+    this.icedPrice,
+    this.price16oz,
+    this.price22oz,
     this.isBestseller = false,
     this.isCourtFavorite = false,
+    this.isSignature = false,
     this.isNew = false,
     this.tags = const [],
     this.accentColor = AppColors.accentOrange,
     this.size = '16 oz (Grande)',
     this.caffeineNote = 'Moderate Caffeine',
+    this.imageAsset,
   });
 
-  String get displayPrice => formattedPrice.isNotEmpty ? formattedPrice : '₱${price.toStringAsFixed(0)}';
+  String get displayPrice {
+    if (formattedPrice.isNotEmpty) return formattedPrice;
+    if (hotPrice != null && icedPrice != null) {
+      return 'Hot ₱${hotPrice!.toStringAsFixed(0)} / Iced ₱${icedPrice!.toStringAsFixed(0)}';
+    }
+    if (price16oz != null && price22oz != null) {
+      return '16oz ₱${price16oz!.toStringAsFixed(0)} / 22oz ₱${price22oz!.toStringAsFixed(0)}';
+    }
+    return '₱${price.toStringAsFixed(0)}';
+  }
 
   /// Factory constructor for Laravel API payloads:
-  /// e.g. {"id": "1", "name": "Milo Overload", "category_slug": "non-coffee", "price": 140.0, ...}
   factory MenuItem.fromJson(Map<String, dynamic> json) {
     return MenuItem(
       id: json['id']?.toString() ?? '',
@@ -93,13 +113,19 @@ class MenuItem {
       category: MenuCategory.fromSlug(json['category_slug'] ?? 'all'),
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       formattedPrice: json['formatted_price'] ?? '',
+      hotPrice: (json['hot_price'] as num?)?.toDouble(),
+      icedPrice: (json['iced_price'] as num?)?.toDouble(),
+      price16oz: (json['price_16oz'] as num?)?.toDouble(),
+      price22oz: (json['price_22oz'] as num?)?.toDouble(),
       isBestseller: json['is_bestseller'] ?? false,
       isCourtFavorite: json['is_court_favorite'] ?? false,
+      isSignature: json['is_signature'] ?? false,
       isNew: json['is_new'] ?? false,
       tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       accentColor: _colorFromCategory(json['category_slug']),
       size: json['size'] ?? '16 oz (Grande)',
       caffeineNote: json['caffeine_note'] ?? 'Crafted Fresh',
+      imageAsset: json['image_asset'],
     );
   }
 
@@ -111,12 +137,18 @@ class MenuItem {
       'category_slug': category.toSlug(),
       'price': price,
       'formatted_price': displayPrice,
+      'hot_price': hotPrice,
+      'iced_price': icedPrice,
+      'price_16oz': price16oz,
+      'price_22oz': price22oz,
       'is_bestseller': isBestseller,
       'is_court_favorite': isCourtFavorite,
+      'is_signature': isSignature,
       'is_new': isNew,
       'tags': tags,
       'size': size,
       'caffeine_note': caffeineNote,
+      'image_asset': imageAsset,
     };
   }
 

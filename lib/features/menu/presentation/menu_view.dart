@@ -133,7 +133,7 @@ class _MenuViewState extends State<MenuView> {
                   crossAxisCount: isTablet ? 2 : 3,
                   crossAxisSpacing: 24,
                   mainAxisSpacing: 24,
-                  childAspectRatio: isTablet ? 0.78 : 0.76,
+                  childAspectRatio: isTablet ? 0.74 : 0.72,
                 ),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
@@ -147,6 +147,66 @@ class _MenuViewState extends State<MenuView> {
                   );
                 },
               ),
+            const SizedBox(height: 36),
+
+            // Official Menu Board Add-ons Strip
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.04),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.1),
+                ),
+              ),
+              child: isMobile
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "OFFICIAL ADD-ONS",
+                          style: AppTypography.scoreboard.copyWith(
+                            fontSize: 11,
+                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.accentOrange,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "Extra Espresso +₱30  •  Substitute Oat Milk +₱40  •  Sweetened Milk +₱15",
+                          style: AppTypography.receipt.copyWith(
+                            fontSize: 11,
+                            letterSpacing: 0.5,
+                            color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "OFFICIAL ADD-ONS",
+                          style: AppTypography.scoreboard.copyWith(
+                            fontSize: 11,
+                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.accentOrange,
+                          ),
+                        ),
+                        Text(
+                          "Extra Espresso +₱30   •   Substitute Oat Milk +₱40   •   Sweetened Milk +₱15",
+                          style: AppTypography.receipt.copyWith(
+                            fontSize: 11,
+                            letterSpacing: 0.6,
+                            color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
           ],
         ),
       ),

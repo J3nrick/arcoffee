@@ -33,9 +33,8 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
   late final Animation<double> _fadeIn;
   late final Animation<Offset> _slideUp;
 
-  // Curated hero photography: Iced coffee on textured outdoor court surface under golden hour sunlight
-  static const String _heroImageUrl =
-      'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=1200&q=85';
+  // Curated hero photography: Official Milo Overload on the Pickleground court baseline
+  static const String _heroImageAsset = 'assets/images/milo_overload_court.png';
 
   @override
   void initState() {
@@ -328,10 +327,10 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    ArcoffeeNetworkImage(
-                      imageUrl: _heroImageUrl,
+                    Image.asset(
+                      _heroImageAsset,
                       fit: BoxFit.cover,
-                      borderRadius: 20,
+                      alignment: Alignment.center,
                     ),
                     // Subtle bottom gradient vignette for metadata contrast
                     Positioned(
@@ -345,8 +344,8 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              AppColors.deepBlue.withOpacity(0.75),
-                              AppColors.deepBlue.withOpacity(0.0),
+                              AppColors.deepBlue.withValues(alpha: 0.75),
+                              AppColors.deepBlue.withValues(alpha: 0.0),
                             ],
                           ),
                         ),
@@ -357,7 +356,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                       bottom: 16,
                       right: 18,
                       child: Text(
-                        "KAWIT, CAVITE  /  SATURDAY 08:42 PM",
+                        "THE PICKLEGROUND PH  •  COURT BASELINE",
                         style: AppTypography.receipt.copyWith(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,

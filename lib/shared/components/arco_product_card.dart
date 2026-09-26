@@ -307,7 +307,15 @@ class _ArcoProductCardState extends State<ArcoProductCard> {
               color: item.accentColor.withOpacity(0.15),
               borderRadius: AppRadii.md,
             ),
-            child: Icon(item.category.icon, color: item.accentColor, size: 20),
+            child: item.imageAsset != null
+                ? ClipRRect(
+                    borderRadius: AppRadii.md,
+                    child: Image.asset(
+                      item.imageAsset!,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Icon(item.category.icon, color: item.accentColor, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -335,7 +343,53 @@ class _ArcoProductCardState extends State<ArcoProductCard> {
     );
   }
 
-  Widget _buildGraphicVisual(MenuItem item, {double height = 96}) {
+  Widget _buildGraphicVisual(MenuItem item, {double height = 110}) {
+    if (item.imageAsset != null) {
+      return Container(
+        height: height,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: AppRadii.lg,
+          border: Border.all(
+            color: item.accentColor.withOpacity(0.25),
+            width: 0.8,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: AppRadii.lg,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                item.imageAsset!,
+                fit: BoxFit.cover,
+              ),
+              Positioned(
+                bottom: 6,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.deepBlue.withOpacity(0.75),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    item.caffeineNote,
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.pureWhite,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       height: height,
       width: double.infinity,

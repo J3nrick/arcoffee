@@ -27,9 +27,9 @@ class _LocationViewState extends State<LocationView> {
   bool _isOpenNow = true;
   bool _isLoading = true;
 
-  // Real location photo representation: The Pickleground PH outdoor court & coffee bar
-  static const String _courtLocationImageUrl =
-      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=1000&q=85';
+  // Real location photo: The Pickleground PH indoor arena overlooking courts
+  static const String _courtLocationAsset =
+      'assets/images/court_arena_drink.jpg';
 
   @override
   void initState() {
@@ -282,10 +282,9 @@ class _LocationViewState extends State<LocationView> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            const ArcoffeeNetworkImage(
-              imageUrl: _courtLocationImageUrl,
+            Image.asset(
+              _courtLocationAsset,
               fit: BoxFit.cover,
-              borderRadius: 20,
             ),
             // Dark gradient overlay for metadata legibility
             Positioned(
