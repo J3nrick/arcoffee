@@ -183,15 +183,21 @@ class _AppScaffoldState extends State<AppScaffold> {
           top: BorderSide(color: theme.borderLight, width: 0.8),
         ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _mobileNavButton(0, CupertinoIcons.house_fill, "Home", theme),
-          _mobileNavButton(1, CupertinoIcons.circle_grid_hex_fill, "Menu", theme),
-          _mobileNavButton(2, CupertinoIcons.person_3_fill, "Community", theme),
-          _mobileNavButton(3, CupertinoIcons.location_fill, "Location", theme),
-        ],
+      child: SafeArea(
+        top: false,
+        bottom: true,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _mobileNavButton(0, CupertinoIcons.house_fill, "Home", theme),
+              _mobileNavButton(1, CupertinoIcons.circle_grid_hex_fill, "Menu", theme),
+              _mobileNavButton(2, CupertinoIcons.person_3_fill, "Community", theme),
+              _mobileNavButton(3, CupertinoIcons.location_fill, "Location", theme),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -200,8 +206,8 @@ class _AppScaffoldState extends State<AppScaffold> {
     final isSelected = _currentTabIndex == index;
 
     return CupertinoButton(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      minSize: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      minSize: 44,
       onPressed: () => _onTabSelected(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,

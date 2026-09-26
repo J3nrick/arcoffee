@@ -69,171 +69,177 @@ class _MenuCardState extends State<MenuCard> with SingleTickerProviderStateMixin
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
             transform: Matrix4.translationValues(0, _isHovered ? -7.0 : 0.0, 0),
-            child: FrostedGlassContainer(
-              borderRadius: 20,
-              backgroundColor: _isHovered
-                  ? (isDark ? const Color(0xFF142436) : AppColors.pureWhite.withOpacity(0.96))
-                  : (isDark ? const Color(0xCC0E1A26) : AppColors.glassWhite),
-              borderColor: _isHovered
-                  ? item.accentColor.withOpacity(0.65)
-                  : theme.borderLight,
-              shadow: BoxShadow(
+            decoration: BoxDecoration(
+              color: _isHovered
+                  ? (isDark ? const Color(0xFF142436) : AppColors.pureWhite)
+                  : theme.cardBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
                 color: _isHovered
-                    ? item.accentColor.withOpacity(isDark ? 0.45 : 0.28)
-                    : (isDark ? const Color(0x66000000) : AppColors.primaryBlue.withOpacity(0.05)),
-                blurRadius: _isHovered ? 32 : 12,
-                spreadRadius: _isHovered ? 2 : 0,
-                offset: Offset(0, _isHovered ? 14 : 4),
+                    ? item.accentColor.withOpacity(0.65)
+                    : theme.borderLight,
+                width: 1.0,
               ),
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Top Row Info
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BadgePill(
-                            label: item.category.displayName,
-                            icon: item.category.icon,
-                            backgroundColor: item.accentColor.withOpacity(isDark ? 0.22 : 0.12),
-                            textColor: item.accentColor,
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: item.accentColor.withOpacity(isDark ? 0.45 : 0.28),
+                        blurRadius: 32,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 14),
+                      ),
+                    ]
+                  : theme.cardElevationShadow,
+            ),
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Top Row Info
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BadgePill(
+                          label: item.category.displayName,
+                          icon: item.category.icon,
+                          backgroundColor: item.accentColor.withOpacity(isDark ? 0.22 : 0.12),
+                          textColor: item.accentColor,
+                          isSmall: true,
+                        ),
+                        if (item.isBestseller)
+                          const BadgePill(
+                            label: '★ BESTSELLER',
+                            backgroundColor: AppColors.badgeHighlight,
+                            textColor: AppColors.accentOrange,
+                            isSmall: true,
+                          )
+                        else if (item.isCourtFavorite)
+                          const BadgePill(
+                            label: 'COURT PICK',
+                            icon: CupertinoIcons.sportscourt_fill,
+                            backgroundColor: Color(0xFFE8F5E9),
+                            textColor: Color(0xFF2E7D32),
+                            isSmall: true,
+                          )
+                        else if (item.isNew)
+                          const BadgePill(
+                            label: 'NEW',
+                            backgroundColor: Color(0xFFEDE7F6),
+                            textColor: Color(0xFF673AB7),
                             isSmall: true,
                           ),
-                          if (item.isBestseller)
-                            const BadgePill(
-                              label: '★ BESTSELLER',
-                              backgroundColor: AppColors.badgeHighlight,
-                              textColor: AppColors.accentOrange,
-                              isSmall: true,
-                            )
-                          else if (item.isCourtFavorite)
-                            const BadgePill(
-                              label: 'COURT PICK',
-                              icon: CupertinoIcons.sportscourt_fill,
-                              backgroundColor: Color(0xFFE8F5E9),
-                              textColor: Color(0xFF2E7D32),
-                              isSmall: true,
-                            )
-                          else if (item.isNew)
-                            const BadgePill(
-                              label: 'NEW',
-                              backgroundColor: Color(0xFFEDE7F6),
-                              textColor: Color(0xFF673AB7),
-                              isSmall: true,
-                            ),
-                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Graphic Visual Banner with Liquid Bobbing Float
+                    _buildLiquidDrinkVisual(item),
+                    const SizedBox(height: 14),
+
+                    // Drink Title
+                    Text(
+                      item.name,
+                      style: AppTypography.headline.copyWith(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w700,
+                        color: theme.primaryText,
                       ),
-                      const SizedBox(height: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
 
-                      // Graphic Visual Banner with Liquid Bobbing Float
-                      _buildLiquidDrinkVisual(item),
-                      const SizedBox(height: 14),
+                    // Drink Description
+                    Text(
+                      item.description,
+                      style: AppTypography.callout.copyWith(
+                        fontSize: 13,
+                        color: theme.secondaryText,
+                        height: 1.35,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
 
-                      // Drink Title
-                      Text(
-                        item.name,
-                        style: AppTypography.headline.copyWith(
-                          fontSize: 19,
-                          fontWeight: FontWeight.w700,
-                          color: theme.primaryText,
+                const SizedBox(height: 16),
+
+                // Bottom Price & Action Button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.displayPrice,
+                          style: AppTypography.priceTag.copyWith(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? AppColors.accentOrange : AppColors.primaryBlue,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Drink Description
-                      Text(
-                        item.description,
-                        style: AppTypography.callout.copyWith(
-                          fontSize: 13,
-                          color: theme.secondaryText,
-                          height: 1.35,
+                        Text(
+                          item.size,
+                          style: AppTypography.caption2.copyWith(
+                            color: theme.tertiaryText,
+                          ),
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      ],
+                    ),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      constraints: const BoxConstraints(minHeight: 44.0, minWidth: 44.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _isHovered
+                            ? AppColors.accentOrange
+                            : (isDark ? const Color(0x33FFFFFF) : AppColors.primaryBlue.withOpacity(0.08)),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: _isHovered
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.accentOrange.withOpacity(0.4),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ]
+                            : null,
                       ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Bottom Price & Action Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            item.displayPrice,
-                            style: AppTypography.priceTag.copyWith(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800,
-                              color: isDark ? AppColors.accentOrange : AppColors.primaryBlue,
-                            ),
-                          ),
-                          Text(
-                            item.size,
-                            style: AppTypography.caption2.copyWith(
-                              color: theme.tertiaryText,
-                            ),
-                          ),
-                        ],
-                      ),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                        decoration: BoxDecoration(
-                          color: _isHovered
-                              ? AppColors.accentOrange
-                              : (isDark ? const Color(0x33FFFFFF) : AppColors.primaryBlue.withOpacity(0.08)),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: _isHovered
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.accentOrange.withOpacity(0.4),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Customize",
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: _isHovered
-                                    ? AppColors.pureWhite
-                                    : (isDark ? AppColors.pureWhite : AppColors.primaryBlue),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              CupertinoIcons.slider_horizontal_3,
-                              size: 13,
+                            "Customize",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
                               color: _isHovered
                                   ? AppColors.pureWhite
                                   : (isDark ? AppColors.pureWhite : AppColors.primaryBlue),
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            CupertinoIcons.slider_horizontal_3,
+                            size: 13,
+                            color: _isHovered
+                                ? AppColors.pureWhite
+                                : (isDark ? AppColors.pureWhite : AppColors.primaryBlue),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

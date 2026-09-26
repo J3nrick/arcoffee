@@ -3,6 +3,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../data/models/menu_item.dart';
 import '../../../../shared/widgets/badge_pill.dart';
+import '../../../../shared/widgets/frosted_glass_container.dart';
 import '../../../../theme/theme_controller.dart';
 
 /// Apple HIG Interactive "Build Your Drink" configuration modal sheet.
@@ -70,24 +71,19 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 540),
-        child: Container(
+        child: FrostedGlassContainer(
           margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0F1B28) : AppColors.creamBackground,
-            borderRadius: BorderRadius.circular(26),
-            border: Border.all(
-              color: isDark ? const Color(0x338FA2B5) : AppColors.borderLight,
-              width: 1.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0x40000000),
-                blurRadius: 40,
-                offset: const Offset(0, 18),
-              ),
-            ],
+          borderRadius: 26,
+          blurSigma: 24.0,
+          backgroundColor: isDark
+              ? const Color(0xE60F1B28)
+              : AppColors.creamBackground.withOpacity(0.92),
+          borderColor: isDark ? const Color(0x408FA2B5) : AppColors.borderLight,
+          shadow: const BoxShadow(
+            color: Color(0x40000000),
+            blurRadius: 40,
+            offset: Offset(0, 18),
           ),
-          clipBehavior: Clip.antiAlias,
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(

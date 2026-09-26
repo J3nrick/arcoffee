@@ -86,7 +86,7 @@ class ThemeController extends ChangeNotifier {
       : AppColors.textSecondary;
 
   Color get tertiaryText => isMidnightCourt
-      ? const Color(0xFF5E7387)
+      ? const Color(0xFF8FA3B8)
       : AppColors.textTertiary;
 
   Color get borderLight => isMidnightCourt

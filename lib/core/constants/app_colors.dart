@@ -24,7 +24,7 @@ abstract class AppColors {
   // Typography & Content
   static const Color textPrimary = Color(0xFF0F2537);
   static const Color textSecondary = Color(0xFF5C6F80);
-  static const Color textTertiary = Color(0xFF8E9EAC);
+  static const Color textTertiary = Color(0xFF526677);
   static const Color textInverse = Color(0xFFFAF7F2);
 
   // Borders & Dividers (Apple HIG Translucent Grays)
