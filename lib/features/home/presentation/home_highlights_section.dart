@@ -141,12 +141,12 @@ class HomeHighlightsSection extends StatelessWidget {
           color: isDark ? AppColors.surfaceNightL2 : AppColors.pureWhite,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.08),
+            color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.08),
             width: 1.2,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.deepBlue.withOpacity(isDark ? 0.35 : 0.08),
+              color: AppColors.deepBlue.withValues(alpha: isDark ? 0.35 : 0.08),
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),

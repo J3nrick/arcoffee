@@ -316,7 +316,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.deepBlue.withOpacity(isDark ? 0.45 : 0.14),
+                    color: AppColors.deepBlue.withValues(alpha: isDark ? 0.45 : 0.14),
                     blurRadius: 28,
                     offset: const Offset(0, 14),
                   ),

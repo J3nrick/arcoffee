@@ -23,7 +23,7 @@ class ArcoBadge extends StatelessWidget {
     final theme = ThemeScope.of(context);
     final isDark = theme.isMidnightCourt;
 
-    final bg = backgroundColor ?? (isDark ? const Color(0x33FFFFFF) : AppColors.deepBlue.withOpacity(0.06));
+    final bg = backgroundColor ?? (isDark ? const Color(0x33FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.06));
     final txt = textColor ?? (isDark ? AppColors.textPrimaryNight : AppColors.deepBlue);
 
     return Container(

@@ -81,7 +81,8 @@ class ArcoLogo extends StatelessWidget {
             Text(
               "ARCOFFEE",
               style: TextStyle(
-                fontFamily: AppTypography.fontFamily,
+                fontFamily: AppTypography.displayFont,
+                fontFamilyFallback: AppTypography.displayFontFallback,
                 fontSize: height * 0.52,
                 fontWeight: FontWeight.w900,
                 letterSpacing: -0.6,

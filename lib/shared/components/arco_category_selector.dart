@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import '../../core/design/app_colors.dart';
 import '../../core/design/app_motion.dart';
 import '../../core/design/app_radii.dart';
+import '../../core/design/app_typography.dart';
 import '../../data/models/menu_item.dart';
 import '../../theme/theme_controller.dart';
 
@@ -39,12 +40,12 @@ class ArcoCategorySelector extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.accentOrange
-                        : (isDark ? const Color(0xFF142434) : AppColors.deepBlue.withOpacity(0.05)),
+                        : (isDark ? const Color(0xFF142434) : AppColors.deepBlue.withValues(alpha: 0.05)),
                     borderRadius: AppRadii.lg,
                     border: Border.all(
                       color: isSelected
                           ? AppColors.accentOrange
-                          : (isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.1)),
+                          : (isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withValues(alpha: 0.1)),
                       width: 1.0,
                     ),
                   ),
@@ -61,6 +62,8 @@ class ArcoCategorySelector extends StatelessWidget {
                       Text(
                         cat.displayName.toUpperCase(),
                         style: TextStyle(
+                          fontFamily: AppTypography.displayFont,
+                          fontFamilyFallback: AppTypography.displayFontFallback,
                           fontSize: 12,
                           fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                           letterSpacing: 0.8,

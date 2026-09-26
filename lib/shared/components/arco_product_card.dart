@@ -351,7 +351,7 @@ class _ArcoProductCardState extends State<ArcoProductCard> {
         decoration: BoxDecoration(
           borderRadius: AppRadii.lg,
           border: Border.all(
-            color: item.accentColor.withOpacity(0.25),
+            color: item.accentColor.withValues(alpha: 0.25),
             width: 0.8,
           ),
         ),
@@ -368,18 +368,20 @@ class _ArcoProductCardState extends State<ArcoProductCard> {
                 bottom: 6,
                 right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.deepBlue.withOpacity(0.75),
+                    color: AppColors.deepBlue.withValues(alpha: 0.82),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     item.caffeineNote,
-                    style: const TextStyle(
+                    style: TextStyle(
+                      fontFamily: AppTypography.monoFont,
+                      fontFamilyFallback: AppTypography.monoFontFallback,
                       fontSize: 9,
                       fontWeight: FontWeight.w700,
                       color: AppColors.pureWhite,
-                      letterSpacing: 0.5,
+                      letterSpacing: 0.8,
                     ),
                   ),
                 ),
@@ -394,9 +396,9 @@ class _ArcoProductCardState extends State<ArcoProductCard> {
       height: height,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: item.accentColor.withOpacity(0.12),
+        color: item.accentColor.withValues(alpha: 0.12),
         borderRadius: AppRadii.lg,
-        border: Border.all(color: item.accentColor.withOpacity(0.25), width: 0.8),
+        border: Border.all(color: item.accentColor.withValues(alpha: 0.25), width: 0.8),
       ),
       alignment: Alignment.center,
       child: Column(

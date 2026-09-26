@@ -37,12 +37,12 @@ class ArcoGlassSurface extends StatelessWidget {
               color: backgroundColor ?? AppColors.glassDay,
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
-                color: borderColor ?? AppColors.pureWhite.withOpacity(0.6),
+                color: borderColor ?? AppColors.pureWhite.withValues(alpha: 0.6),
                 width: 1.0,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.deepBlue.withOpacity(0.08),
+                  color: AppColors.deepBlue.withValues(alpha: 0.08),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),

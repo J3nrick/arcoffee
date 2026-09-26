@@ -25,13 +25,13 @@ class ArcoScoreboardMetadata extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: isHighlight
-            ? AppColors.accentOrange.withOpacity(0.12)
-            : (isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.04)),
+            ? AppColors.accentOrange.withValues(alpha: 0.12)
+            : (isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.04)),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: isHighlight
-              ? AppColors.accentOrange.withOpacity(0.4)
-              : (isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.1)),
+              ? AppColors.accentOrange.withValues(alpha: 0.4)
+              : (isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.1)),
           width: 0.8,
         ),
       ),
@@ -72,7 +72,8 @@ class ArcoReceiptText extends StatelessWidget {
     return Text(
       text,
       style: (style ?? AppTypography.receipt).copyWith(
-        fontFamily: 'Courier',
+        fontFamily: AppTypography.monoFont,
+        fontFamilyFallback: AppTypography.monoFontFallback,
       ),
     );
   }

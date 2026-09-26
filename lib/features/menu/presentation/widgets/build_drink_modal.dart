@@ -77,8 +77,8 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
           blurSigma: 24.0,
           backgroundColor: isDark
               ? const Color(0xE60F1B28)
-              : AppColors.warmCream.withOpacity(0.95),
-          borderColor: isDark ? const Color(0x408FA2B5) : AppColors.deepBlue.withOpacity(0.12),
+              : AppColors.warmCream.withValues(alpha: 0.96),
+          borderColor: isDark ? const Color(0x408FA2B5) : AppColors.deepBlue.withValues(alpha: 0.12),
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(
@@ -91,15 +91,15 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        item.accentColor.withOpacity(isDark ? 0.35 : 0.2),
-                        item.accentColor.withOpacity(isDark ? 0.1 : 0.04),
+                        item.accentColor.withValues(alpha: isDark ? 0.35 : 0.2),
+                        item.accentColor.withValues(alpha: isDark ? 0.1 : 0.04),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     border: Border(
                       bottom: BorderSide(
-                        color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.12),
+                        color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.12),
                         width: 0.8,
                       ),
                     ),

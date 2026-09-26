@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import '../core/design/app_breakpoints.dart';
 import '../core/design/app_colors.dart';
+import '../core/design/app_typography.dart';
 import '../data/models/menu_item.dart';
 import '../data/repositories/gallery_repository.dart';
 import '../data/repositories/menu_repository.dart';
@@ -150,7 +151,7 @@ class _AppScaffoldState extends State<AppScaffold> {
         color: theme.glassBackground,
         border: Border(
           top: BorderSide(
-            color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.08),
+            color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withValues(alpha: 0.08),
             width: 0.8,
           ),
         ),
@@ -195,8 +196,11 @@ class _AppScaffoldState extends State<AppScaffold> {
           Text(
             label,
             style: TextStyle(
+              fontFamily: AppTypography.displayFont,
+              fontFamilyFallback: AppTypography.displayFontFallback,
               fontSize: 10,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+              letterSpacing: 0.2,
               color: isSelected
                   ? AppColors.accentOrange
                   : (isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay),

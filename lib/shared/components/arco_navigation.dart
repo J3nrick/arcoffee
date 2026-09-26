@@ -51,14 +51,14 @@ class ArcoNavigation extends StatelessWidget {
                 border: Border.all(
                   color: isDark
                       ? const Color(0x338FA2B5)
-                      : AppColors.pureWhite.withOpacity(0.6),
+                      : AppColors.pureWhite.withValues(alpha: 0.6),
                   width: 1.0,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: isDark
                         ? const Color(0x66000000)
-                        : AppColors.deepBlue.withOpacity(0.08),
+                        : AppColors.deepBlue.withValues(alpha: 0.08),
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
@@ -131,11 +131,14 @@ class ArcoNavigation extends StatelessWidget {
                 child: Text(
                   navItems[index],
                   style: TextStyle(
+                    fontFamily: AppTypography.displayFont,
+                    fontFamilyFallback: AppTypography.displayFontFallback,
                     fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    letterSpacing: -0.2,
                     color: isSelected
                         ? AppColors.accentOrange
-                        : (isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay),
+                        : (isDark ? AppColors.textSecondaryNight : AppColors.textPrimaryDay),
                   ),
                 ),
               ),
@@ -154,10 +157,10 @@ class ArcoNavigation extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF192C3D) : AppColors.deepBlue.withOpacity(0.06),
+            color: isDark ? const Color(0xFF192C3D) : AppColors.deepBlue.withValues(alpha: 0.06),
             borderRadius: AppRadii.pill,
             border: Border.all(
-              color: isDark ? AppColors.accentOrange.withOpacity(0.5) : AppColors.courtLineDay,
+              color: isDark ? AppColors.accentOrange.withValues(alpha: 0.5) : AppColors.courtLineDay,
               width: 1.0,
             ),
           ),
@@ -174,8 +177,11 @@ class ArcoNavigation extends StatelessWidget {
                 Text(
                   isDark ? "Midnight" : "Day Court",
                   style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontFamily: AppTypography.monoFont,
+                    fontFamilyFallback: AppTypography.monoFontFallback,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
                     color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
                   ),
                 ),

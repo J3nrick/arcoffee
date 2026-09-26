@@ -37,12 +37,12 @@ class ArcoSticker extends StatelessWidget {
           color: bg,
           borderRadius: BorderRadius.circular(4),
           border: Border.all(
-            color: txt.withOpacity(0.2),
+            color: txt.withValues(alpha: 0.2),
             width: 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.deepBlue.withOpacity(0.08),
+              color: AppColors.deepBlue.withValues(alpha: 0.08),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),

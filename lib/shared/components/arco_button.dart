@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import '../../core/design/app_colors.dart';
 import '../../core/design/app_motion.dart';
 import '../../core/design/app_radii.dart';
+import '../../core/design/app_typography.dart';
 import '../../theme/theme_controller.dart';
 
 enum ArcoButtonVariant {
@@ -92,8 +93,10 @@ class _ArcoButtonState extends State<ArcoButton> {
           Text(
             widget.text,
             style: TextStyle(
+              fontFamily: AppTypography.displayFont,
+              fontFamilyFallback: AppTypography.displayFontFallback,
               fontSize: 14,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800,
               color: fg,
               letterSpacing: -0.2,
             ),

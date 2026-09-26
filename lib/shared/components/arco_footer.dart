@@ -154,7 +154,7 @@ class ArcoFooter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.06),
+        color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(

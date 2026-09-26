@@ -266,12 +266,12 @@ class _LocationViewState extends State<LocationView> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.08),
+          color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.08),
           width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.deepBlue.withOpacity(isDark ? 0.35 : 0.08),
+            color: AppColors.deepBlue.withValues(alpha: isDark ? 0.35 : 0.08),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -298,8 +298,8 @@ class _LocationViewState extends State<LocationView> {
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      AppColors.deepBlue.withOpacity(0.8),
-                      AppColors.deepBlue.withOpacity(0.0),
+                      AppColors.deepBlue.withValues(alpha: 0.8),
+                      AppColors.deepBlue.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -312,7 +312,7 @@ class _LocationViewState extends State<LocationView> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xCC07111D) : AppColors.deepBlue.withOpacity(0.85),
+                  color: isDark ? const Color(0xCC07111D) : AppColors.deepBlue.withValues(alpha: 0.85),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const ArcoLogo(

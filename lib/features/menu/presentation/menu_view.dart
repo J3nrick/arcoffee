@@ -154,10 +154,10 @@ class _MenuViewState extends State<MenuView> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withOpacity(0.04),
+                color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.1),
+                  color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.1),
                 ),
               ),
               child: isMobile

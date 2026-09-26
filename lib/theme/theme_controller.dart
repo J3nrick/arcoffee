@@ -62,15 +62,15 @@ class ThemeController extends ChangeNotifier {
   // --- Dynamic Theme Color Tokens ---
 
   Color get scaffoldBackground => isMidnightCourt
-      ? const Color(0xFF07111C)
+      ? const Color(0xFF08111B)
       : AppColors.creamBackground;
 
   Color get cardBackground => isMidnightCourt
-      ? const Color(0xFF0E1A26)
+      ? const Color(0xFF0F1E2E)
       : AppColors.pureWhite;
 
   Color get glassBackground => isMidnightCourt
-      ? const Color(0xCC0B1824)
+      ? const Color(0xD90A1522)
       : AppColors.glassFill;
 
   Color get glassWhite => isMidnightCourt
@@ -78,48 +78,48 @@ class ThemeController extends ChangeNotifier {
       : AppColors.glassWhite;
 
   Color get primaryText => isMidnightCourt
-      ? const Color(0xFFFAF7F2)
+      ? const Color(0xFFFBF7EB)
       : AppColors.textPrimary;
 
   Color get secondaryText => isMidnightCourt
-      ? const Color(0xFF8FA2B5)
+      ? const Color(0xFF90A4B8)
       : AppColors.textSecondary;
 
   Color get tertiaryText => isMidnightCourt
-      ? const Color(0xFF8FA3B8)
+      ? const Color(0xFF6B8094)
       : AppColors.textTertiary;
 
   Color get borderLight => isMidnightCourt
-      ? const Color(0x2E8FA2B5)
+      ? const Color(0x337A92A8)
       : AppColors.borderLight;
 
   Color get accentOrange => AppColors.accentOrange;
 
   Color get desktopWallpaper => isMidnightCourt
       ? const Color(0xFF040A10)
-      : const Color(0xFFEFE9E0);
+      : const Color(0xFFEDE4D4);
 
   Color get titlebarBg => isMidnightCourt
       ? const Color(0xF2091420)
-      : const Color(0xF2F4ECE1);
+      : const Color(0xF2FBF7EB);
 
   List<BoxShadow> get glowingOrangeShadow => isMidnightCourt
       ? [
           BoxShadow(
-            color: AppColors.accentOrange.withOpacity(0.55),
+            color: AppColors.accentOrange.withValues(alpha: 0.55),
             blurRadius: 24,
             spreadRadius: 2,
             offset: const Offset(0, 4),
           ),
           BoxShadow(
-            color: AppColors.accentOrange.withOpacity(0.2),
+            color: AppColors.accentOrange.withValues(alpha: 0.2),
             blurRadius: 40,
             spreadRadius: 6,
           ),
         ]
       : [
           BoxShadow(
-            color: AppColors.accentOrange.withOpacity(0.35),
+            color: AppColors.accentOrange.withValues(alpha: 0.35),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -128,14 +128,14 @@ class ThemeController extends ChangeNotifier {
   List<BoxShadow> get cardElevationShadow => isMidnightCourt
       ? [
           BoxShadow(
-            color: const Color(0xFF000000).withOpacity(0.4),
+            color: const Color(0xFF000000).withValues(alpha: 0.4),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
         ]
       : [
           BoxShadow(
-            color: AppColors.primaryBlue.withOpacity(0.06),
+            color: AppColors.primaryBlue.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
