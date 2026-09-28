@@ -85,94 +85,159 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Top Header Graphic
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        item.accentColor.withValues(alpha: isDark ? 0.35 : 0.2),
-                        item.accentColor.withValues(alpha: isDark ? 0.1 : 0.04),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.12),
-                        width: 0.8,
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: AppColors.pureWhite,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: item.accentColor.withOpacity(0.35),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 3),
-                                ),
+                // Top Header Graphic / Photograph
+                if (item.imageAsset != null)
+                  SizedBox(
+                    height: 160,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          item.imageAsset!,
+                          fit: BoxFit.cover,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                (isDark ? const Color(0xFF0F1B28) : AppColors.deepBlue).withValues(alpha: 0.92),
+                                CupertinoColors.transparent,
                               ],
                             ),
-                            child: ClipOval(
-                              child: item.imageAsset != null
-                                  ? Image.asset(
-                                      item.imageAsset!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Icon(
-                                      item.category.icon,
-                                      color: item.accentColor,
-                                      size: 24,
-                                    ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 14,
+                          right: 14,
+                          child: CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            minSize: 32,
+                            borderRadius: BorderRadius.circular(16),
+                            color: AppColors.deepBlue.withValues(alpha: 0.75),
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Icon(
+                              CupertinoIcons.xmark,
+                              size: 16,
+                              color: AppColors.pureWhite,
                             ),
                           ),
-                          const SizedBox(width: 14),
-                          Column(
+                        ),
+                        Positioned(
+                          bottom: 14,
+                          left: 20,
+                          right: 20,
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 item.name,
                                 style: AppTypography.heading.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: theme.primaryText,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.pureWhite,
+                                  fontSize: 20,
                                 ),
                               ),
-                              const SizedBox(height: 2),
+                              const SizedBox(height: 3),
                               Text(
                                 "Base Price: ${item.displayPrice} • ${item.size}",
-                                style: AppTypography.bodySmall.copyWith(
-                                  color: theme.secondaryText,
+                                style: AppTypography.scoreboard.copyWith(
+                                  color: AppColors.accentOrange,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ],
                           ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          item.accentColor.withValues(alpha: isDark ? 0.35 : 0.2),
+                          item.accentColor.withValues(alpha: isDark ? 0.1 : 0.04),
                         ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        minSize: 32,
-                        borderRadius: BorderRadius.circular(16),
-                        color: isDark ? const Color(0x33FFFFFF) : AppColors.deepBlue.withOpacity(0.1),
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: Icon(
-                          CupertinoIcons.xmark,
-                          size: 16,
-                          color: theme.primaryText,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.12),
+                          width: 0.8,
                         ),
                       ),
-                    ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: AppColors.pureWhite,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: item.accentColor.withValues(alpha: 0.35),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ClipOval(
+                                child: Icon(
+                                  item.category.icon,
+                                  color: item.accentColor,
+                                  size: 24,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.name,
+                                  style: AppTypography.heading.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: theme.primaryText,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "Base Price: ${item.displayPrice} • ${item.size}",
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: theme.secondaryText,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minSize: 32,
+                          borderRadius: BorderRadius.circular(16),
+                          color: isDark ? const Color(0x33FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.1),
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Icon(
+                            CupertinoIcons.xmark,
+                            size: 16,
+                            color: theme.primaryText,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
                 // Customization Body
                 Padding(
@@ -186,7 +251,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.05),
+                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.all(3),
@@ -212,7 +277,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.05),
+                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.all(3),
@@ -238,7 +303,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.05),
+                          color: isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.all(3),
@@ -281,13 +346,13 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? AppColors.accentOrange.withOpacity(isDark ? 0.25 : 0.12)
-                                    : (isDark ? const Color(0x18FFFFFF) : AppColors.deepBlue.withOpacity(0.04)),
+                                    ? AppColors.accentOrange.withValues(alpha: isDark ? 0.25 : 0.12)
+                                    : (isDark ? const Color(0x18FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.04)),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isSelected
                                       ? AppColors.accentOrange
-                                      : (isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.12)),
+                                      : (isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.12)),
                                   width: 1.0,
                                 ),
                               ),
@@ -344,7 +409,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                               boxShadow: [
                                 BoxShadow(
                                   color: (_isAddedToTray ? const Color(0xFF34C759) : AppColors.accentOrange)
-                                      .withOpacity(0.4),
+                                      .withValues(alpha: 0.4),
                                   blurRadius: 18,
                                   offset: const Offset(0, 6),
                                 ),

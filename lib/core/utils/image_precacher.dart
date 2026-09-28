@@ -18,6 +18,14 @@ class ImagePrecacher {
     'assets/images/spanish_latte_mascot.jpg',
     'assets/images/matcha_pour.png',
     'assets/images/soda_series_studio.png',
+    'assets/images/soda_trio_court.jpg',
+    'assets/images/mango_americano_espresso.jpg',
+    'assets/images/stand_poster_specials.png',
+    'assets/images/espresso_pour_latte.jpg',
+    'assets/images/espresso_crema_latte.png',
+    'assets/images/syrup_scale_prep.png',
+    'assets/images/green_apple_sky.jpg',
+    'assets/images/menu_board.png',
   ];
 
   static Future<void> precacheCoreAssets(BuildContext context) async {

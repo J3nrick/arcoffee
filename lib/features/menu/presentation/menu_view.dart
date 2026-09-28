@@ -11,6 +11,7 @@ import '../../../theme/theme_controller.dart';
 import 'widgets/build_drink_modal.dart';
 
 /// Editorial Menu View for Arcoffee ("Court-side coffee culture").
+/// Showcases authentic drinks, category filtering, search, and official printed menu board lightbox.
 class MenuView extends StatefulWidget {
   final MenuRepository repository;
 
@@ -21,8 +22,9 @@ class MenuView extends StatefulWidget {
 }
 
 class _MenuViewState extends State<MenuView> {
-  MenuCategory _selectedCategory = MenuCategory.coffee;
+  MenuCategory _selectedCategory = MenuCategory.all;
   List<MenuItem> _allItems = [];
+  String _searchQuery = '';
   bool _isLoading = true;
 
   @override
@@ -41,7 +43,75 @@ class _MenuViewState extends State<MenuView> {
   }
 
   List<MenuItem> get _filteredItems {
-    return _allItems.where((item) => item.category == _selectedCategory).toList();
+    return _allItems.where((item) {
+      final matchesCategory = _selectedCategory == MenuCategory.all || item.category == _selectedCategory;
+      final matchesSearch = _searchQuery.isEmpty ||
+          item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().contains(_searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }).toList();
+  }
+
+  void _showMenuBoardLightbox(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (ctx) {
+        return Container(
+          color: AppColors.deepBlue.withValues(alpha: 0.95),
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Center(
+                  child: InteractiveViewer(
+                    maxScale: 4.0,
+                    child: Image.asset(
+                      'assets/images/menu_board.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: CupertinoButton(
+                    color: AppColors.accentOrange,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text(
+                      "CLOSE ✕",
+                      style: TextStyle(
+                        fontFamily: AppTypography.displayFont,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.pureWhite,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    color: AppColors.deepBlue.withValues(alpha: 0.8),
+                    child: Text(
+                      "OFFICIAL PRINTED MENU BOARD • THE PICKLEGROUND PH, KAWIT, CAVITE",
+                      style: TextStyle(
+                        fontFamily: AppTypography.monoFont,
+                        fontFamilyFallback: AppTypography.monoFontFallback,
+                        fontSize: 11,
+                        color: AppColors.pureWhite,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -71,26 +141,81 @@ class _MenuViewState extends State<MenuView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // Header Row with Title & "View Menu Board" action
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const ArcoSticker(text: "CRAFT MENU • 2026", rotation: -0.01),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Craft Drink Selection",
+                        style: AppTypography.display.copyWith(
+                          color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
+                          fontSize: isMobile ? 28 : 38,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (!isMobile)
+                  CupertinoButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    color: isDark ? const Color(0xFF16283C) : AppColors.deepBlue.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(6),
+                    onPressed: () => _showMenuBoardLightbox(context),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(CupertinoIcons.doc_text_viewfinder, size: 16, color: AppColors.accentOrange),
+                        const SizedBox(width: 8),
+                        Text(
+                          "View Printed Menu Board",
+                          style: TextStyle(
+                            fontFamily: AppTypography.displayFont,
+                            fontFamilyFallback: AppTypography.displayFontFallback,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? AppColors.pureWhite : AppColors.deepBlue,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            if (isMobile) ...[
+              const SizedBox(height: 14),
+              CupertinoButton(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                color: isDark ? const Color(0xFF16283C) : AppColors.deepBlue.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(6),
+                onPressed: () => _showMenuBoardLightbox(context),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const ArcoSticker(text: "CRAFT MENU", rotation: -0.01),
-                    const SizedBox(height: 8),
+                    const Icon(CupertinoIcons.doc_text_viewfinder, size: 15, color: AppColors.accentOrange),
+                    const SizedBox(width: 6),
                     Text(
-                      "Craft Drink Selection",
-                      style: AppTypography.display.copyWith(
-                        color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                        fontSize: isMobile ? 28 : 36,
+                      "View Printed Menu Board",
+                      style: TextStyle(
+                        fontFamily: AppTypography.displayFont,
+                        fontFamilyFallback: AppTypography.displayFontFallback,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: isDark ? AppColors.pureWhite : AppColors.deepBlue,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
             const SizedBox(height: 24),
 
             // Horizontal Category Selector
@@ -102,7 +227,7 @@ class _MenuViewState extends State<MenuView> {
             ),
             const SizedBox(height: 32),
 
-            // Items Grid (Asymmetric & Responsive)
+            // Items Grid with Large 180px Photo Headers
             if (items.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(48.0),
@@ -117,10 +242,13 @@ class _MenuViewState extends State<MenuView> {
               Column(
                 children: items.map((item) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: ArcoProductCard(
-                      item: item,
-                      onTap: () => BuildDrinkModal.show(context, item),
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: SizedBox(
+                      height: 340,
+                      child: ArcoProductCard(
+                        item: item,
+                        onTap: () => BuildDrinkModal.show(context, item),
+                      ),
                     ),
                   );
                 }).toList(),
@@ -133,14 +261,14 @@ class _MenuViewState extends State<MenuView> {
                   crossAxisCount: isTablet ? 2 : 3,
                   crossAxisSpacing: 24,
                   mainAxisSpacing: 24,
-                  childAspectRatio: isTablet ? 0.74 : 0.72,
+                  childAspectRatio: isTablet ? 0.65 : 0.62,
                 ),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final item = items[index];
                   return ArcoProductCard(
                     item: item,
-                    variant: (index == 0 && !isMobile)
+                    variant: (index == 0 && !isMobile && _selectedCategory == MenuCategory.all)
                         ? ArcoCardVariant.featured
                         : ArcoCardVariant.standard,
                     onTap: () => BuildDrinkModal.show(context, item),
@@ -175,7 +303,7 @@ class _MenuViewState extends State<MenuView> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          "Extra Espresso +₱30  •  Substitute Oat Milk +₱40  •  Sweetened Milk +₱15",
+                          "Extra Espresso +₱30  •  Substitute Oat Milk +₱40  •  Sweetened Milk +₱15  •  Haw-Haw Cold Foam +₱40  •  Malt Overload +₱25",
                           style: AppTypography.receipt.copyWith(
                             fontSize: 11,
                             letterSpacing: 0.5,
@@ -197,7 +325,7 @@ class _MenuViewState extends State<MenuView> {
                           ),
                         ),
                         Text(
-                          "Extra Espresso +₱30   •   Substitute Oat Milk +₱40   •   Sweetened Milk +₱15",
+                          "Extra Espresso +₱30   •   Substitute Oat Milk +₱40   •   Sweetened Milk +₱15   •   Haw-Haw Foam +₱40   •   Malt Overload +₱25",
                           style: AppTypography.receipt.copyWith(
                             fontSize: 11,
                             letterSpacing: 0.6,

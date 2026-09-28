@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import '../../../core/design/app_breakpoints.dart';
 import '../../../core/design/app_colors.dart';
 import '../../../core/design/app_typography.dart';
-import '../../../core/utils/image_precacher.dart';
 import '../../../data/models/store_info.dart';
 import '../../../data/repositories/store_repository.dart';
 import '../../../shared/components/arco_button.dart';
@@ -30,6 +29,107 @@ class _LocationViewState extends State<LocationView> {
   // Real location photo: The Pickleground PH indoor arena overlooking courts
   static const String _courtLocationAsset =
       'assets/images/court_arena_drink.jpg';
+
+  void _openLocationLightbox(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      barrierColor: const Color(0xE607111D),
+      builder: (ctx) {
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 880, maxHeight: 720),
+            child: Container(
+              margin: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F1B28),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColors.accentOrange.withValues(alpha: 0.4),
+                  width: 1.2,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    InteractiveViewer(
+                      minScale: 1.0,
+                      maxScale: 3.5,
+                      child: Center(
+                        child: Image.asset(
+                          _courtLocationAsset,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minSize: 36,
+                        borderRadius: BorderRadius.circular(18),
+                        color: AppColors.deepBlue.withValues(alpha: 0.8),
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Icon(
+                          CupertinoIcons.xmark,
+                          color: AppColors.pureWhite,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 20,
+                      left: 20,
+                      right: 20,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.deepBlue.withValues(alpha: 0.88),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.accentOrange.withValues(alpha: 0.4),
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "THE PICKLEGROUND PH • KAWIT ARENA",
+                              style: TextStyle(
+                                fontFamily: AppTypography.scoreboardFont,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.0,
+                                color: AppColors.accentOrange,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Arcoffee courtside specialty bar operating alongside tournament-standard pickleball courts in Kawit, Cavite.",
+                              style: TextStyle(
+                                fontFamily: AppTypography.bodyFont,
+                                fontSize: 13,
+                                color: AppColors.pureWhite,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -261,94 +361,123 @@ class _LocationViewState extends State<LocationView> {
 
   /// Right Side Location Photograph & Court Geometry Overlay
   Widget _buildLocationPhotoCard(bool isDark, {double height = 380}) {
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.08),
-          width: 1.0,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.deepBlue.withValues(alpha: isDark ? 0.35 : 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              _courtLocationAsset,
-              fit: BoxFit.cover,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _openLocationLightbox(context),
+        child: Container(
+          height: height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.08),
+              width: 1.0,
             ),
-            // Dark gradient overlay for metadata legibility
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 90,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      AppColors.deepBlue.withValues(alpha: 0.8),
-                      AppColors.deepBlue.withValues(alpha: 0.0),
-                    ],
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.deepBlue.withValues(alpha: isDark ? 0.35 : 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  _courtLocationAsset,
+                  fit: BoxFit.cover,
+                ),
+                // Dark gradient overlay for metadata legibility
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 90,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          AppColors.deepBlue.withValues(alpha: 0.8),
+                          AppColors.deepBlue.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            // Top Right Official Logo Brand Mark
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xCC07111D) : AppColors.deepBlue.withValues(alpha: 0.85),
-                  borderRadius: BorderRadius.circular(8),
+                // Top Left: Expand Indicator
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.deepBlue.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      "[ VIEW FULLSCREEN ]",
+                      style: TextStyle(
+                        fontFamily: AppTypography.monoFont,
+                        fontFamilyFallback: AppTypography.monoFontFallback,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                        color: AppColors.accentOrange,
+                      ),
+                    ),
+                  ),
                 ),
-                child: const ArcoLogo(
-                  height: 16,
-                  showText: false,
-                  color: AppColors.pureWhite,
-                ),
-              ),
-            ),
-            // Bottom Coordinates Caption
-            Positioned(
-              bottom: 16,
-              left: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "COORDINATES: 14.4445° N, 120.9038° E",
-                    style: AppTypography.scoreboard.copyWith(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
+                // Top Right Official Logo Brand Mark
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xCC07111D) : AppColors.deepBlue.withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const ArcoLogo(
+                      height: 16,
+                      showText: false,
                       color: AppColors.pureWhite,
                     ),
                   ),
-                  Text(
-                    "THE PICKLEGROUND PH / KAWIT, CAVITE",
-                    style: AppTypography.receipt.copyWith(
-                      fontSize: 10,
-                      color: AppColors.softSand,
-                    ),
+                ),
+                // Bottom Coordinates Caption
+                Positioned(
+                  bottom: 16,
+                  left: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "COORDINATES: 14.4445° N, 120.9038° E",
+                        style: AppTypography.scoreboard.copyWith(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.0,
+                          color: AppColors.pureWhite,
+                        ),
+                      ),
+                      Text(
+                        "THE PICKLEGROUND PH / KAWIT, CAVITE",
+                        style: AppTypography.receipt.copyWith(
+                          fontSize: 10,
+                          color: AppColors.softSand,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

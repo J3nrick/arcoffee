@@ -59,7 +59,7 @@ class ArcoCornerBracket extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ThemeScope.of(context);
     final isDark = theme.isMidnightCourt;
-    final color = isDark ? AppColors.accentOrange.withOpacity(0.4) : AppColors.deepBlue.withOpacity(0.25);
+    final color = isDark ? AppColors.accentOrange.withValues(alpha: 0.4) : AppColors.deepBlue.withValues(alpha: 0.25);
 
     return Stack(
       children: [

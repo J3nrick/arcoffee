@@ -3,9 +3,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/design/app_breakpoints.dart';
 import '../../../core/design/app_colors.dart';
 import '../../../core/design/app_motion.dart';
-import '../../../core/design/app_radii.dart';
 import '../../../core/design/app_typography.dart';
-import '../../../core/utils/image_precacher.dart';
 import '../../../shared/components/arco_button.dart';
 import '../../../shared/components/arco_court_line.dart';
 import '../../../shared/components/arco_logo.dart';
@@ -33,8 +31,141 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
   late final Animation<double> _fadeIn;
   late final Animation<Offset> _slideUp;
 
-  // Curated hero photography: Official Milo Overload on the Pickleground court baseline
-  static const String _heroImageAsset = 'assets/images/milo_overload_court.png';
+  // Curated hero photography: Curated authentic courtside shots
+  int _activeHeroPhotoIndex = 0;
+
+  static const List<Map<String, String>> _heroPhotos = [
+    {
+      'asset': 'assets/images/milo_overload_court.png',
+      'num': '01',
+      'title': 'MILO OVERLOAD ON COURT BASELINE',
+      'caption': 'THE PICKLEGROUND PH • COURT BASELINE',
+      'story': 'Signature chilled malt beverage topped with thick Milo powder overload, shot courtside at The Pickleground PH.',
+    },
+    {
+      'asset': 'assets/images/court_arena_drink.jpg',
+      'num': '02',
+      'title': 'INDOOR ARENA & ESPRESSO BAR',
+      'caption': 'THE PICKLEGROUND PH • KAWIT ARENA',
+      'story': 'Full view of the active indoor pickleball tournament courts and the Arcoffee espresso bar in Kawit, Cavite.',
+    },
+    {
+      'asset': 'assets/images/green_apple_court_line.jpg',
+      'num': '03',
+      'title': 'GREEN APPLE CRAFT SODA',
+      'caption': 'COURT NON-VOLLEY LINE • CHILLED',
+      'story': 'Crisp, sparkling house-crafted green apple soda served ice-cold directly on the tournament court line.',
+    },
+    {
+      'asset': 'assets/images/lychee_soda_chat_paddle.jpg',
+      'num': '04',
+      'title': 'POST-RALLY CHAT & PADDLE',
+      'caption': 'COMMUNITY BENCH • SIDELINE SESSIONS',
+      'story': 'Arcoffee refreshing sparkling lychee soda on the player bench beside a graphite pickleball paddle after an intense rally.',
+    },
+  ];
+
+  void _openHeroLightbox(BuildContext context, int index) {
+    final photo = _heroPhotos[index];
+    showCupertinoModalPopup<void>(
+      context: context,
+      barrierColor: const Color(0xE607111D),
+      builder: (ctx) {
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 880, maxHeight: 720),
+            child: Container(
+              margin: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F1B28),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColors.accentOrange.withValues(alpha: 0.4),
+                  width: 1.2,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    InteractiveViewer(
+                      minScale: 1.0,
+                      maxScale: 3.5,
+                      child: Center(
+                        child: Image.asset(
+                          photo['asset']!,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minSize: 36,
+                        borderRadius: BorderRadius.circular(18),
+                        color: AppColors.deepBlue.withValues(alpha: 0.8),
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Icon(
+                          CupertinoIcons.xmark,
+                          color: AppColors.pureWhite,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 20,
+                      left: 20,
+                      right: 20,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.deepBlue.withValues(alpha: 0.88),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.accentOrange.withValues(alpha: 0.4),
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              photo['title']!,
+                              style: TextStyle(
+                                fontFamily: AppTypography.scoreboardFont,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.0,
+                                color: AppColors.accentOrange,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              photo['story']!,
+                              style: TextStyle(
+                                fontFamily: AppTypography.bodyFont,
+                                fontSize: 13,
+                                color: AppColors.pureWhite,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -302,70 +433,178 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
     );
   }
 
-  /// Right-side Full-Bleed Editorial Photograph with Overlapping Tilted Sticker
+  /// Right-side Full-Bleed Editorial Photograph with Overlapping Tilted Sticker & Switcher
   Widget _buildEditorialPhotoFocalPoint(ThemeController theme, bool isDark, {required double height}) {
+    final activePhoto = _heroPhotos[_activeHeroPhotoIndex];
+
     return SizedBox(
       height: height,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Main Full-Bleed Photograph
+          // Main Full-Bleed Photograph with Interactive Tap-to-Enlarge
           Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.deepBlue.withValues(alpha: isDark ? 0.45 : 0.14),
-                    blurRadius: 28,
-                    offset: const Offset(0, 14),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => _openHeroLightbox(context, _activeHeroPhotoIndex),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.deepBlue.withValues(alpha: isDark ? 0.45 : 0.14),
+                        blurRadius: 28,
+                        offset: const Offset(0, 14),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      _heroImageAsset,
-                      fit: BoxFit.cover,
-                      alignment: Alignment.center,
-                    ),
-                    // Subtle bottom gradient vignette for metadata contrast
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: 80,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              AppColors.deepBlue.withValues(alpha: 0.75),
-                              AppColors.deepBlue.withValues(alpha: 0.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 350),
+                          switchInCurve: Curves.easeOut,
+                          switchOutCurve: Curves.easeIn,
+                          child: SizedBox.expand(
+                            key: ValueKey<String>(activePhoto['asset']!),
+                            child: Image.asset(
+                              activePhoto['asset']!,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.center,
+                            ),
+                          ),
+                        ),
+                        // Subtle bottom gradient vignette for metadata contrast
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: 110,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  AppColors.deepBlue.withValues(alpha: 0.88),
+                                  AppColors.deepBlue.withValues(alpha: 0.0),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Top bar: Editorial Photo Carousel Switcher Tabs (01, 02, 03, 04)
+                        Positioned(
+                          top: 14,
+                          right: 14,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.deepBlue.withValues(alpha: 0.85),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isDark ? const Color(0x33FFFFFF) : AppColors.softSand.withValues(alpha: 0.3),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(_heroPhotos.length, (idx) {
+                                final isSelected = idx == _activeHeroPhotoIndex;
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _activeHeroPhotoIndex = idx;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? AppColors.accentOrange : CupertinoColors.transparent,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      _heroPhotos[idx]['num']!,
+                                      style: TextStyle(
+                                        fontFamily: AppTypography.monoFont,
+                                        fontFamilyFallback: AppTypography.monoFontFallback,
+                                        fontSize: 11,
+                                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                                        color: isSelected ? AppColors.pureWhite : AppColors.softSand,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                        ),
+                        // Top Left: Expand Indicator
+                        Positioned(
+                          top: 14,
+                          left: 14,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.deepBlue.withValues(alpha: 0.8),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              "[ VIEW FULLSCREEN ]",
+                              style: TextStyle(
+                                fontFamily: AppTypography.monoFont,
+                                fontFamilyFallback: AppTypography.monoFontFallback,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8,
+                                color: AppColors.accentOrange,
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Bottom Metadata Caption on Image
+                        Positioned(
+                          bottom: 16,
+                          right: 18,
+                          left: 90,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                activePhoto['title']!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: AppTypography.scoreboardFont,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.8,
+                                  color: AppColors.accentOrange,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                activePhoto['caption']!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.receipt.copyWith(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.6,
+                                  color: AppColors.pureWhite,
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                    // Bottom Metadata Caption on Image
-                    Positioned(
-                      bottom: 16,
-                      right: 18,
-                      child: Text(
-                        "THE PICKLEGROUND PH  •  COURT BASELINE",
-                        style: AppTypography.receipt.copyWith(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                          color: AppColors.pureWhite,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -384,7 +623,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.deepBlue.withOpacity(0.28),
+                      color: AppColors.deepBlue.withValues(alpha: 0.28),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),

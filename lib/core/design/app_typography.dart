@@ -8,6 +8,7 @@ abstract class AppTypography {
   static const String displayFont = 'Plus Jakarta Sans';
   static const String bodyFont = 'Inter';
   static const String monoFont = 'JetBrains Mono';
+  static const String scoreboardFont = monoFont;
 
   // Fallbacks ensuring native Apple SF Pro rendering on iOS/macOS and crisp web fonts on Windows/Web
   static const List<String> displayFontFallback = [

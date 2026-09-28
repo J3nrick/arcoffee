@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import '../../../core/design/app_breakpoints.dart';
 import '../../../core/design/app_colors.dart';
 import '../../../core/design/app_typography.dart';
-import '../../../core/utils/image_precacher.dart';
 import '../../../data/models/menu_item.dart';
 import '../../../shared/components/arco_button.dart';
 import '../../../shared/components/arco_court_line.dart';

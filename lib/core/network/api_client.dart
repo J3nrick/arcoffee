@@ -12,6 +12,9 @@ class ApiClient {
   final dio_pkg.Dio? _dio;
   final http.Client? _httpClient;
 
+  /// Optional Dio instance accessor for advanced streaming/interceptors.
+  dio_pkg.Dio? get dio => _dio;
+
   ApiClient({
     String? baseUrl,
     dio_pkg.Dio? dio,

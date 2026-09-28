@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/design/app_breakpoints.dart';
 import '../../core/design/app_colors.dart';
 import '../../core/design/app_motion.dart';
@@ -124,7 +123,7 @@ class ArcoNavigation extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.accentOrange.withOpacity(0.12)
+                      ? AppColors.accentOrange.withValues(alpha: 0.12)
                       : CupertinoColors.transparent,
                   borderRadius: AppRadii.md,
                 ),

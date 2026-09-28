@@ -5,7 +5,6 @@ import '../../../../core/constants/app_typography.dart';
 import '../../../../data/models/menu_item.dart';
 import '../../../../shared/widgets/badge_pill.dart';
 import '../../../../shared/widgets/custom_cursor.dart';
-import '../../../../shared/widgets/frosted_glass_container.dart';
 import '../../../../theme/theme_controller.dart';
 
 /// Apple HIG macOS-style Drink Card featuring continuous liquid bobbing float physics,
