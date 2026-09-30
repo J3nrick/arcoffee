@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
+import '../../core/utils/image_precacher.dart';
 import '../../data/repositories/gallery_repository.dart';
 import '../../data/repositories/menu_repository.dart';
 import '../../data/repositories/store_repository.dart';
 import '../../data/services/gallery_service.dart';
 import '../../data/services/menu_service.dart';
+import '../../data/services/order_tray_service.dart';
 import '../../data/services/store_service.dart';
 import '../app_scaffold.dart';
 
@@ -19,7 +21,7 @@ import '../app_scaffold.dart';
 ///                Logo gently elevates (-30px) and expands (1.0 -> 1.08) while dissolving,
 ///                as AppScaffold floats upward and blooms seamlessly on the shared cream canvas.
 ///
-/// Built with pure Flutter animations, 60fps native performance, and zero external packages.
+/// Also handles instantaneous Court QR-code bypass when ?source=qr or ?order=court or ?court=X is detected.
 class SplashScreen extends StatefulWidget {
   final Widget? homeScreen;
 
@@ -47,6 +49,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   Timer? _navigationTimer;
   bool _isNavigating = false;
+  bool _assetsPrecached = false;
+  int _initialTabIndex = 0;
+  String? _preselectedCourt;
 
   // Exact sampled cream background from the brand logo asset to ensure zero borders
   static const Color creamBackground = Color(0xFFFBF7EB);
@@ -54,13 +59,37 @@ class _SplashScreenState extends State<SplashScreen>
       'assets/547188584_122096374029023682_3566562690668451689_n_2.jpg';
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_assetsPrecached) {
+      _assetsPrecached = true;
+      precacheImage(const AssetImage(logoAsset), context);
+      ImagePrecacher.precacheCoreAssets(context);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
 
-    // 1. Phase 1: Entrance animation (0 to 1200ms)
+    // Inspect URI parameters for court-side QR code bypass
+    final uri = Uri.base;
+    final source = uri.queryParameters['source']?.toLowerCase();
+    final order = uri.queryParameters['order']?.toLowerCase();
+    final court = uri.queryParameters['court'];
+
+    final bool isQrBypass = source == 'qr' || order == 'court' || (court != null && court.isNotEmpty);
+    if (court != null && court.isNotEmpty) {
+      OrderTrayService.instance.setCourtNumber(court);
+    }
+
+    _initialTabIndex = isQrBypass ? 1 : 0;
+    _preselectedCourt = court;
+
+    // 1. Phase 1: Entrance animation
     _introController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: Duration(milliseconds: isQrBypass ? 500 : 1200),
     );
 
     final CurvedAnimation introDecel = CurvedAnimation(
@@ -82,10 +111,10 @@ class _SplashScreenState extends State<SplashScreen>
       end: Offset.zero,
     ).animate(introDecel);
 
-    // 2. Phase 2: Living breath & editorial metadata reveal (1200ms to 3800ms)
+    // 2. Phase 2: Living breath & editorial metadata reveal
     _breathController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2600),
+      duration: Duration(milliseconds: isQrBypass ? 500 : 2600),
     );
 
     _breathScale = Tween<double>(begin: 1.0, end: 1.028).animate(
@@ -118,24 +147,30 @@ class _SplashScreenState extends State<SplashScreen>
       _breathController.forward();
     });
 
-    // 3. Phase 3: At 3800ms, automatically trigger the 1200ms cinematic transition to Home
-    // (Total splash duration = 3800ms hold + 1200ms transition = 5000ms / 5 seconds)
-    _navigationTimer = Timer(const Duration(milliseconds: 3800), _navigateToHome);
+    // 3. Phase 3: Trigger transition to target view
+    // Normal visit: 3800ms hold + transition = ~5s cinematic sequence
+    // QR code scan: snappy 700ms quick-flash right into Menu
+    final splashHoldMs = isQrBypass ? 700 : 3800;
+    _navigationTimer = Timer(Duration(milliseconds: splashHoldMs), _navigateToHome);
   }
 
   void _navigateToHome() {
     if (_isNavigating || !mounted) return;
     _isNavigating = true;
 
-    final targetScreen = widget.homeScreen ?? _createDefaultHomeScreen();
+    final targetScreen = widget.homeScreen ??
+        _createDefaultHomeScreen(
+          initialTabIndex: _initialTabIndex,
+          preselectedCourt: _preselectedCourt,
+        );
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 1200),
+        transitionDuration: Duration(milliseconds: _initialTabIndex == 1 ? 600 : 1200),
         pageBuilder: (context, animation, secondaryAnimation) => targetScreen,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           // Luxury Apple Keynote-style transition:
-          // Incoming Home screen floats upward and dissolves in smoothly
+          // Incoming screen floats upward and dissolves in smoothly
           final curved = CurvedAnimation(
             parent: animation,
             curve: Curves.easeOutQuart,
@@ -171,7 +206,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  Widget _createDefaultHomeScreen() {
+  Widget _createDefaultHomeScreen({int initialTabIndex = 0, String? preselectedCourt}) {
     final apiClient = ApiClient();
     final menuService = MenuService(apiClient: apiClient);
     final storeService = StoreService(apiClient: apiClient);
@@ -181,6 +216,8 @@ class _SplashScreenState extends State<SplashScreen>
       menuRepository: AppMenuRepository(menuService: menuService),
       storeRepository: AppStoreRepository(storeService: storeService),
       galleryRepository: AppGalleryRepository(galleryService: galleryService),
+      initialTabIndex: initialTabIndex,
+      preselectedCourt: preselectedCourt,
     );
   }
 

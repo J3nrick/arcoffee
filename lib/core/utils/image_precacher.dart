@@ -7,6 +7,7 @@ import '../design/app_colors.dart';
 class ImagePrecacher {
   /// Priority local asset images to preload on app startup
   static const List<String> priorityAssetPaths = [
+    'assets/547188584_122096374029023682_3566562690668451689_n_2.jpg',
     'assets/images/milo_overload_court.png',
     'assets/images/mango_americano_counter.jpg',
     'assets/images/court_arena_drink.jpg',
@@ -76,7 +77,7 @@ class ArcoffeeNetworkImage extends StatelessWidget {
         placeholder: (context, url) => Container(
           width: width,
           height: height,
-          color: placeholderColor ?? AppColors.deepBlue.withOpacity(0.06),
+          color: placeholderColor ?? AppColors.deepBlue.withValues(alpha: 0.06),
           child: const Center(
             child: CupertinoActivityIndicator(radius: 12),
           ),
@@ -91,7 +92,7 @@ class ArcoffeeNetworkImage extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: placeholderColor ?? AppColors.deepBlue.withOpacity(0.08),
+        color: placeholderColor ?? AppColors.deepBlue.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: const Center(

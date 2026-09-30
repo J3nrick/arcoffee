@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import '../../../../core/design/app_colors.dart';
 import '../../../../core/design/app_typography.dart';
 import '../../../../data/models/menu_item.dart';
+import '../../../../data/models/tray_item.dart';
+import '../../../../data/services/order_tray_service.dart';
 import '../../../../shared/components/arco_glass_surface.dart';
 import '../../../../theme/theme_controller.dart';
 
@@ -55,6 +57,28 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
   void _onAddToTrayPressed() async {
     if (_isAddedToTray) return;
     setState(() => _isAddedToTray = true);
+
+    final sizeStr = _selectedSizeIndex == 1
+        ? 'Grande 20oz'
+        : (_selectedSizeIndex == 2 ? 'Cold Bottle' : 'Regular 16oz');
+    final iceStr = _selectedIceIndex == 0
+        ? 'Less Ice (70%)'
+        : (_selectedIceIndex == 2 ? 'Extra Chill' : 'Regular Ice (100%)');
+    final sweetnessStr = _selectedSweetnessIndex == 0
+        ? 'Unsweetened (0%)'
+        : (_selectedSweetnessIndex == 1 ? 'Half Sweet (50%)' : 'Classic (100%)');
+
+    final trayItem = TrayItem(
+      id: '${widget.item.id}_${DateTime.now().millisecondsSinceEpoch}',
+      menuItem: widget.item,
+      size: sizeStr,
+      iceLevel: iceStr,
+      sweetness: sweetnessStr,
+      addons: _selectedAddons.toList(),
+      unitPrice: _currentTotalPrice,
+      quantity: 1,
+    );
+    OrderTrayService.instance.addItem(trayItem);
 
     await Future.delayed(const Duration(milliseconds: 750));
     if (mounted) {
@@ -430,7 +454,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                                   Text(
                                     _isAddedToTray
                                         ? "Added to Courtside Tray!"
-                                        : "Add to Tray • ₱${_currentTotalPrice.toStringAsFixed(0)}",
+                                        : "Order to Court • ₱${_currentTotalPrice.toStringAsFixed(0)}",
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,

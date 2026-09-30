@@ -237,7 +237,7 @@ class CupertinoCustomNavBar extends StatelessWidget {
       minSize: 36,
       onPressed: onActionPressed,
       child: const Text(
-        "Order Now",
+        "Order to Court",
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w700,

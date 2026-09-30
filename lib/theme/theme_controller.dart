@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import '../core/constants/app_colors.dart';
+import '../core/utils/theme_clock.dart';
 
 /// Available aesthetic modes for Arcoffee.
 enum CourtThemeMode {
@@ -21,24 +22,11 @@ class ThemeController extends ChangeNotifier {
   bool get isMidnightCourt => _mode == CourtThemeMode.midnightCourt;
   bool get isManualOverride => _isManualOverride;
 
-  /// Evaluates current schedule:
-  /// On Fri-Sun late-night / overnight (or any evening past 7:00 PM),
-  /// defaults to "Midnight Court" mode.
+  /// Evaluates current schedule using ThemeClock:
+  /// On Fri, Sat, Sun evening/late-night hours (6:00 PM to 4:00 AM) or nocturnal hours,
+  /// defaults to "Night Court" mode.
   void _evaluateTimeOfDay() {
-    final now = DateTime.now();
-    final hour = now.hour;
-    final weekday = now.weekday; // 5 = Friday, 6 = Saturday, 7 = Sunday
-
-    // Friday - Sunday late night / 24-hour session
-    final isWeekend24h = weekday == DateTime.friday ||
-        weekday == DateTime.saturday ||
-        weekday == DateTime.sunday;
-
-    final isNightHours = hour >= 19 || hour < 6;
-
-    if (isWeekend24h && isNightHours) {
-      _mode = CourtThemeMode.midnightCourt;
-    } else if (isNightHours) {
+    if (ThemeClock.isNightCourtActive()) {
       _mode = CourtThemeMode.midnightCourt;
     } else {
       _mode = CourtThemeMode.dayCourt;
@@ -62,23 +50,23 @@ class ThemeController extends ChangeNotifier {
   // --- Dynamic Theme Color Tokens ---
 
   Color get scaffoldBackground => isMidnightCourt
-      ? const Color(0xFF08111B)
+      ? const Color(0xFF0B1F33) // Arcoffee Navy
       : AppColors.creamBackground;
 
   Color get cardBackground => isMidnightCourt
-      ? const Color(0xFF0F1E2E)
+      ? const Color(0xFF10283E)
       : AppColors.pureWhite;
 
   Color get glassBackground => isMidnightCourt
-      ? const Color(0xD90A1522)
+      ? const Color(0xD90A1B2C)
       : AppColors.glassFill;
 
   Color get glassWhite => isMidnightCourt
-      ? const Color(0xB8122334)
+      ? const Color(0xB8132B42)
       : AppColors.glassWhite;
 
   Color get primaryText => isMidnightCourt
-      ? const Color(0xFFFBF7EB)
+      ? const Color(0xFFFBF7EB) // Cream Text
       : AppColors.textPrimary;
 
   Color get secondaryText => isMidnightCourt
@@ -93,33 +81,33 @@ class ThemeController extends ChangeNotifier {
       ? const Color(0x337A92A8)
       : AppColors.borderLight;
 
-  Color get accentOrange => AppColors.accentOrange;
+  Color get accentOrange => const Color(0xFFF36B21); // Arcoffee Orange
 
   Color get desktopWallpaper => isMidnightCourt
-      ? const Color(0xFF040A10)
+      ? const Color(0xFF050E17)
       : const Color(0xFFEDE4D4);
 
   Color get titlebarBg => isMidnightCourt
-      ? const Color(0xF2091420)
+      ? const Color(0xF20B1F33)
       : const Color(0xF2FBF7EB);
 
   List<BoxShadow> get glowingOrangeShadow => isMidnightCourt
       ? [
           BoxShadow(
-            color: AppColors.accentOrange.withValues(alpha: 0.55),
+            color: const Color(0xFFF36B21).withValues(alpha: 0.60),
             blurRadius: 24,
             spreadRadius: 2,
             offset: const Offset(0, 4),
           ),
           BoxShadow(
-            color: AppColors.accentOrange.withValues(alpha: 0.2),
+            color: const Color(0xFFF36B21).withValues(alpha: 0.25),
             blurRadius: 40,
             spreadRadius: 6,
           ),
         ]
       : [
           BoxShadow(
-            color: AppColors.accentOrange.withValues(alpha: 0.35),
+            color: const Color(0xFFF36B21).withValues(alpha: 0.35),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),

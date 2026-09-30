@@ -230,11 +230,26 @@ class _MenuViewState extends State<MenuView> {
             // Items Grid with Large 180px Photo Headers
             if (items.isEmpty)
               Padding(
-                padding: const EdgeInsets.all(48.0),
+                padding: const EdgeInsets.symmetric(vertical: 64.0, horizontal: 24.0),
                 child: Center(
-                  child: Text(
-                    "No items found in this category.",
-                    style: AppTypography.bodyLarge,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "No drinks found in this line-up.",
+                        style: AppTypography.heading.copyWith(
+                          color: isDark ? AppColors.pureWhite : AppColors.deepBlue,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Try switching categories or clearing search to find your match.",
+                        style: AppTypography.bodySmall.copyWith(
+                          color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               )

@@ -5,11 +5,12 @@ import 'package:flutter/cupertino.dart';
 abstract class AppColors {
   // Brand Foundation
   static const Color deepBlue = Color(0xFF0B1B2B);
+  static const Color navyCourt = Color(0xFF0B1F33);   // Arcoffee Navy Nocturnal Canvas
   static const Color warmCream = Color(0xFFFBF7EB);
-  static const Color accentOrange = Color(0xFFF36622);
+  static const Color accentOrange = Color(0xFFF36B21); // Arcoffee Court Orange
   static const Color softSand = Color(0xFFEDE4D4);
   static const Color mutedBlue = Color(0xFF5E7387);
-  static const Color darkNight = Color(0xFF08111B);
+  static const Color darkNight = Color(0xFF0B1F33);
   static const Color pureWhite = Color(0xFFFFFFFF);
 
   // Surface Elevations (Day Court)
@@ -19,10 +20,10 @@ abstract class AppColors {
   static const Color glassDay = Color(0xEBFAF6EC);    // Floating Glass Surface
 
   // Surface Elevations (Midnight Court)
-  static const Color surfaceNightL1 = Color(0xFF08111B); // Canvas: Deep Nocturnal Arena
-  static const Color surfaceNightL2 = Color(0xFF0F1E2E); // Elevated Solid Card
-  static const Color surfaceNightL3 = Color(0xFF16283C); // Subtle Secondary Surface
-  static const Color glassNight = Color(0xD90A1522);    // Floating Glass Surface
+  static const Color surfaceNightL1 = Color(0xFF0B1F33); // Canvas: Arcoffee Navy Arena
+  static const Color surfaceNightL2 = Color(0xFF10283E); // Elevated Solid Card
+  static const Color surfaceNightL3 = Color(0xFF18354F); // Subtle Secondary Surface
+  static const Color glassNight = Color(0xD90A1B2C);    // Floating Glass Surface
 
   // Semantic Typography (Day Court)
   static const Color textPrimaryDay = Color(0xFF0B1B2B);

@@ -6,26 +6,33 @@ import '../data/models/menu_item.dart';
 import '../data/repositories/gallery_repository.dart';
 import '../data/repositories/menu_repository.dart';
 import '../data/repositories/store_repository.dart';
+import '../data/services/order_tray_service.dart';
 import '../shared/components/arco_footer.dart';
 import '../shared/components/arco_navigation.dart';
 import '../theme/theme_controller.dart';
+import 'error/presentation/out_of_bounds_view.dart';
 import 'gallery/presentation/gallery_view.dart';
 import 'home/presentation/home_hero_section.dart';
 import 'home/presentation/home_highlights_section.dart';
 import 'location/presentation/location_view.dart';
 import 'menu/presentation/menu_view.dart';
+import 'order/presentation/court_side_delivery_modal.dart';
 
 /// Main application orchestrator for Arcoffee ("Court-side coffee culture").
 class AppScaffold extends StatefulWidget {
   final MenuRepository menuRepository;
   final StoreRepository storeRepository;
   final GalleryRepository galleryRepository;
+  final int initialTabIndex;
+  final String? preselectedCourt;
 
   const AppScaffold({
     super.key,
     required this.menuRepository,
     required this.storeRepository,
     required this.galleryRepository,
+    this.initialTabIndex = 0,
+    this.preselectedCourt,
   });
 
   @override
@@ -33,13 +40,17 @@ class AppScaffold extends StatefulWidget {
 }
 
 class _AppScaffoldState extends State<AppScaffold> {
-  int _currentTabIndex = 0;
+  late int _currentTabIndex;
   final ScrollController _scrollController = ScrollController();
   List<MenuItem> _featuredItems = [];
 
   @override
   void initState() {
     super.initState();
+    _currentTabIndex = widget.initialTabIndex;
+    if (widget.preselectedCourt != null && widget.preselectedCourt!.isNotEmpty) {
+      OrderTrayService.instance.setCourtNumber(widget.preselectedCourt!);
+    }
     _loadFeatured();
   }
 
@@ -70,6 +81,13 @@ class _AppScaffoldState extends State<AppScaffold> {
     super.dispose();
   }
 
+  void _openOrderModal() {
+    CourtSideDeliveryModal.show(
+      context,
+      onExploreMenu: () => _onTabSelected(1),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ThemeScope.of(context);
@@ -84,7 +102,7 @@ class _AppScaffoldState extends State<AppScaffold> {
           ArcoNavigation(
             selectedIndex: _currentTabIndex,
             onTabSelected: _onTabSelected,
-            onOrderPressed: () => _onTabSelected(1),
+            onOrderPressed: _openOrderModal,
           ),
 
           // Scrollable View Content
@@ -140,12 +158,22 @@ class _AppScaffoldState extends State<AppScaffold> {
         return GalleryView(repository: widget.galleryRepository);
       case 3:
         return LocationView(repository: widget.storeRepository);
+      case 4:
+        return OutOfBoundsView(
+          onReturnToMenu: () => _onTabSelected(1),
+          onReturnHome: () => _onTabSelected(0),
+        );
       default:
-        return MenuView(repository: widget.menuRepository);
+        return OutOfBoundsView(
+          onReturnToMenu: () => _onTabSelected(1),
+          onReturnHome: () => _onTabSelected(0),
+        );
     }
   }
 
   Widget _buildMobileBottomBar(ThemeController theme, bool isDark) {
+    final tray = OrderTrayService.instance;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.glassBackground,
@@ -166,6 +194,7 @@ class _AppScaffoldState extends State<AppScaffold> {
             children: [
               _mobileNavButton(0, CupertinoIcons.house_fill, "Home", theme, isDark),
               _mobileNavButton(1, CupertinoIcons.circle_grid_hex_fill, "Menu", theme, isDark),
+              _mobileDeliveryButton(theme, isDark, tray),
               _mobileNavButton(2, CupertinoIcons.person_3_fill, "Wall", theme, isDark),
               _mobileNavButton(3, CupertinoIcons.location_fill, "Visit", theme, isDark),
             ],
@@ -175,11 +204,83 @@ class _AppScaffoldState extends State<AppScaffold> {
     );
   }
 
+  Widget _mobileDeliveryButton(ThemeController theme, bool isDark, OrderTrayService tray) {
+    return AnimatedBuilder(
+      animation: tray,
+      builder: (context, _) {
+        final count = tray.itemCount;
+
+        return CupertinoButton(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          minSize: 44,
+          onPressed: _openOrderModal,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.accentOrange,
+                      shape: BoxShape.circle,
+                      boxShadow: theme.glowingOrangeShadow,
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.paperplane_fill,
+                      size: 16,
+                      color: AppColors.pureWhite,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    "Order",
+                    style: TextStyle(
+                      fontFamily: AppTypography.displayFont,
+                      fontFamilyFallback: AppTypography.displayFontFallback,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.2,
+                      color: AppColors.accentOrange,
+                    ),
+                  ),
+                ],
+              ),
+              if (count > 0)
+                Positioned(
+                  top: -2,
+                  right: -4,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF34C759),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      "$count",
+                      style: const TextStyle(
+                        fontFamily: AppTypography.monoFont,
+                        fontFamilyFallback: AppTypography.monoFontFallback,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.pureWhite,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _mobileNavButton(int index, IconData icon, String label, ThemeController theme, bool isDark) {
     final isSelected = _currentTabIndex == index;
 
     return CupertinoButton(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       minSize: 44,
       onPressed: () => _onTabSelected(index),
       child: Column(

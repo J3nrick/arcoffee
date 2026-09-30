@@ -80,7 +80,7 @@ class ArcoNavigation extends StatelessWidget {
                       if (!isMobile) ...[
                         const SizedBox(width: 12),
                         ArcoButton(
-                          text: "Order Now",
+                          text: "Order to Court",
                           onPressed: onOrderPressed,
                           variant: ArcoButtonVariant.primary,
                         ),
