@@ -46,19 +46,19 @@ class CupertinoCustomNavBar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isDark
                     ? const Color(0xCC0B1824)
-                    : AppColors.pureWhite.withOpacity(0.82),
+                    : AppColors.pureWhite.withValues(alpha: 0.82),
                 borderRadius: BorderRadius.circular(isMobile ? 18 : 24),
                 border: Border.all(
                   color: isDark
                       ? const Color(0x338FA2B5)
-                      : AppColors.pureWhite.withOpacity(0.6),
+                      : AppColors.pureWhite.withValues(alpha: 0.6),
                   width: 1.0,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: isDark
                         ? const Color(0x66000000)
-                        : AppColors.primaryBlue.withOpacity(0.08),
+                        : AppColors.primaryBlue.withValues(alpha: 0.08),
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
@@ -167,9 +167,9 @@ class CupertinoCustomNavBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             borderRadius: BorderRadius.circular(12),
             color: isSelected
-                ? (isDark ? const Color(0x33FFFFFF) : AppColors.accentOrange.withOpacity(0.12))
+                ? (isDark ? const Color(0x33FFFFFF) : AppColors.accentOrange.withValues(alpha: 0.12))
                 : CupertinoColors.transparent,
-            minSize: 36,
+            minimumSize: const Size(36, 36),
             onPressed: () => onTabSelected(index),
             child: Text(
               links[index],
@@ -196,10 +196,10 @@ class CupertinoCustomNavBar extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF192C3D) : AppColors.primaryBlue.withOpacity(0.06),
+            color: isDark ? const Color(0xFF192C3D) : AppColors.primaryBlue.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isDark ? AppColors.accentOrange.withOpacity(0.5) : AppColors.borderLight,
+              color: isDark ? AppColors.accentOrange.withValues(alpha: 0.5) : AppColors.borderLight,
               width: 1.0,
             ),
           ),
@@ -234,7 +234,7 @@ class CupertinoCustomNavBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       borderRadius: BorderRadius.circular(16),
       color: AppColors.accentOrange,
-      minSize: 36,
+      minimumSize: const Size(36, 36),
       onPressed: onActionPressed,
       child: const Text(
         "Order to Court",

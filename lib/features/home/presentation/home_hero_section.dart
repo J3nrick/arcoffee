@@ -104,7 +104,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                       right: 16,
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
-                        minSize: 36,
+                        minimumSize: const Size(36, 36),
                         borderRadius: BorderRadius.circular(18),
                         color: AppColors.deepBlue.withValues(alpha: 0.8),
                         onPressed: () => Navigator.of(ctx).pop(),
@@ -135,7 +135,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                           children: [
                             Text(
                               photo['title']!,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontFamily: AppTypography.scoreboardFont,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,
@@ -146,7 +146,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                             const SizedBox(height: 4),
                             Text(
                               photo['story']!,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontFamily: AppTypography.bodyFont,
                                 fontSize: 13,
                                 color: AppColors.pureWhite,
@@ -285,7 +285,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
 
               // Tagline
               Text(
-                "\"${AppConstants.slogan}\"",
+                "“${AppConstants.slogan}”",
                 style: AppTypography.bodyLarge.copyWith(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
@@ -295,13 +295,16 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
               ),
               const SizedBox(height: 14),
 
-              // Editorial Narrative Description
-              Text(
-                "Craft specialty coffee, non-coffee overloads & ice-cold sodas served directly alongside the pickleball courts in Kawit, Cavite.",
-                style: AppTypography.bodyLarge.copyWith(
-                  fontSize: 16,
-                  height: 1.5,
-                  color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+              // Editorial Narrative Description with Swiss 60ch Measure
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Text(
+                  "Craft specialty coffee, non-coffee overloads & ice-cold sodas served directly alongside the pickleball courts in Kawit, Cavite.",
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontSize: 16,
+                    height: 1.5,
+                    color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
+                  ),
                 ),
               ),
               const SizedBox(height: 36),
@@ -384,7 +387,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
 
         // Tagline
         Text(
-          "\"${AppConstants.slogan}\"",
+          "“${AppConstants.slogan}”",
           style: AppTypography.body.copyWith(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -553,7 +556,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                               color: AppColors.deepBlue.withValues(alpha: 0.8),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text(
+                            child: const Text(
                               "[ VIEW FULLSCREEN ]",
                               style: TextStyle(
                                 fontFamily: AppTypography.monoFont,
@@ -579,7 +582,7 @@ class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProv
                                 activePhoto['title']!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontFamily: AppTypography.scoreboardFont,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w800,

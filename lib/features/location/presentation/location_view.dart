@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/design/app_breakpoints.dart';
 import '../../../core/design/app_colors.dart';
 import '../../../core/design/app_typography.dart';
@@ -25,6 +27,24 @@ class _LocationViewState extends State<LocationView> {
   StoreInfo? _storeInfo;
   bool _isOpenNow = true;
   bool _isLoading = true;
+  bool _copiedAddress = false;
+
+  Future<void> _openDirections() async {
+    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=14.4445,120.9038');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _copyAddress() async {
+    const address = "The Pickleground PH, Centennial Road, Kawit, Cavite";
+    await Clipboard.setData(const ClipboardData(text: address));
+    if (!mounted) return;
+    setState(() => _copiedAddress = true);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _copiedAddress = false);
+    });
+  }
 
   // Real location photo: The Pickleground PH indoor arena overlooking courts
   static const String _courtLocationAsset =
@@ -68,7 +88,7 @@ class _LocationViewState extends State<LocationView> {
                       right: 16,
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
-                        minSize: 36,
+                        minimumSize: const Size(36, 36),
                         borderRadius: BorderRadius.circular(18),
                         color: AppColors.deepBlue.withValues(alpha: 0.8),
                         onPressed: () => Navigator.of(ctx).pop(),
@@ -93,7 +113,7 @@ class _LocationViewState extends State<LocationView> {
                             width: 1.0,
                           ),
                         ),
-                        child: Column(
+                        child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -107,7 +127,7 @@ class _LocationViewState extends State<LocationView> {
                                 color: AppColors.accentOrange,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               "Arcoffee courtside specialty bar operating alongside tournament-standard pickleball courts in Kawit, Cavite.",
                               style: TextStyle(
@@ -349,11 +369,23 @@ class _LocationViewState extends State<LocationView> {
         ),
         const SizedBox(height: 36),
 
-        // Directions Button
-        ArcoButton(
-          text: "Get Directions via Waze / Maps →",
-          onPressed: () {},
-          variant: ArcoButtonVariant.primary,
+        // Navigation Actions
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            ArcoButton(
+              text: "Open Maps / Waze →",
+              onPressed: _openDirections,
+              variant: ArcoButtonVariant.primary,
+            ),
+            ArcoButton(
+              text: _copiedAddress ? "Address Copied ✓" : "Copy Address",
+              icon: _copiedAddress ? CupertinoIcons.check_mark : CupertinoIcons.doc_on_clipboard,
+              onPressed: _copyAddress,
+              variant: ArcoButtonVariant.secondary,
+            ),
+          ],
         ),
       ],
     );
@@ -419,7 +451,7 @@ class _LocationViewState extends State<LocationView> {
                       color: AppColors.deepBlue.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Text(
+                    child: const Text(
                       "[ VIEW FULLSCREEN ]",
                       style: TextStyle(
                         fontFamily: AppTypography.monoFont,

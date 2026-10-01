@@ -58,8 +58,8 @@ class _CustomCursorWrapperState extends State<CustomCursorWrapper> {
     final isInteractive = CursorController.instance.isInteractive;
     final ringSize = isInteractive ? 42.0 : 20.0;
     final ringColor = isInteractive
-        ? AppColors.accentOrange.withOpacity(0.85)
-        : AppColors.primaryBlue.withOpacity(0.6);
+        ? AppColors.accentOrange.withValues(alpha: 0.85)
+        : AppColors.primaryBlue.withValues(alpha: 0.6);
 
     return MouseRegion(
       cursor: SystemMouseCursors.none,
@@ -89,7 +89,7 @@ class _CustomCursorWrapperState extends State<CustomCursorWrapper> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isInteractive
-                        ? AppColors.accentOrange.withOpacity(0.15)
+                        ? AppColors.accentOrange.withValues(alpha: 0.15)
                         : CupertinoColors.transparent,
                     border: Border.all(
                       color: ringColor,
@@ -98,7 +98,7 @@ class _CustomCursorWrapperState extends State<CustomCursorWrapper> {
                     boxShadow: isInteractive
                         ? [
                             BoxShadow(
-                              color: AppColors.accentOrange.withOpacity(0.4),
+                              color: AppColors.accentOrange.withValues(alpha: 0.4),
                               blurRadius: 16,
                               spreadRadius: 2,
                             ),

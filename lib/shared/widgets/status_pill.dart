@@ -20,10 +20,10 @@ class StatusPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.12),
+        color: statusColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: statusColor.withOpacity(0.28),
+          color: statusColor.withValues(alpha: 0.28),
           width: 1,
         ),
       ),
@@ -38,7 +38,7 @@ class StatusPill extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: statusColor.withOpacity(0.5),
+                  color: statusColor.withValues(alpha: 0.5),
                   blurRadius: 4,
                   spreadRadius: 1,
                 ),

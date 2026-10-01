@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/design/app_breakpoints.dart';
 import '../../core/design/app_colors.dart';
@@ -59,7 +60,7 @@ class ArcoFooter extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              "\"${AppConstants.slogan}\"".toUpperCase(),
+              "“${AppConstants.slogan}”".toUpperCase(),
               style: AppTypography.scoreboard.copyWith(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -106,9 +107,9 @@ class ArcoFooter extends StatelessWidget {
               runSpacing: 8,
               alignment: WrapAlignment.center,
               children: [
-                _buildSocialBadge("IG", "@arcoffeeph", isDark),
-                _buildSocialBadge("FB", "@ARCoffee", isDark),
-                _buildSocialBadge("TIKTOK", "@arcoffeeph", isDark),
+                _buildSocialBadge("IG", "@arcoffeeph", "https://www.instagram.com/arcoffeeph/", isDark),
+                _buildSocialBadge("FB", "@ARCoffee", "https://www.facebook.com/ARCoffee/", isDark),
+                _buildSocialBadge("TIKTOK", "@arcoffeeph", "https://www.tiktok.com/@arcoffeeph", isDark),
               ],
             ),
             const SizedBox(height: 36),
@@ -154,34 +155,45 @@ class ArcoFooter extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialBadge(String platform, String handle, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "$platform  ",
-            style: AppTypography.scoreboard.copyWith(
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.8,
-              color: AppColors.accentOrange,
-            ),
+  Widget _buildSocialBadge(String platform, String handle, String url, bool isDark) {
+    return GestureDetector(
+      onTap: () async {
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(4),
           ),
-          Text(
-            handle,
-            style: AppTypography.receipt.copyWith(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textSecondaryNight : AppColors.deepBlue,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "$platform  ",
+                style: AppTypography.scoreboard.copyWith(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.8,
+                  color: AppColors.accentOrange,
+                ),
+              ),
+              Text(
+                handle,
+                style: AppTypography.receipt.copyWith(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppColors.textSecondaryNight : AppColors.deepBlue,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -336,7 +348,7 @@ class _JoinTheClubSectionState extends State<_JoinTheClubSection> {
         color: AppColors.accentOrange,
         borderRadius: BorderRadius.circular(8),
         onPressed: _handleSubscribe,
-        child: Text(
+        child: const Text(
           "Join the Club",
           style: TextStyle(
             fontFamily: AppTypography.displayFont,

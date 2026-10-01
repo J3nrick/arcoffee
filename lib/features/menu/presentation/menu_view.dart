@@ -24,7 +24,7 @@ class MenuView extends StatefulWidget {
 class _MenuViewState extends State<MenuView> {
   MenuCategory _selectedCategory = MenuCategory.all;
   List<MenuItem> _allItems = [];
-  String _searchQuery = '';
+  final String _searchQuery = '';
   bool _isLoading = true;
 
   @override
@@ -94,7 +94,7 @@ class _MenuViewState extends State<MenuView> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     color: AppColors.deepBlue.withValues(alpha: 0.8),
-                    child: Text(
+                    child: const Text(
                       "OFFICIAL PRINTED MENU BOARD • THE PICKLEGROUND PH, KAWIT, CAVITE",
                       style: TextStyle(
                         fontFamily: AppTypography.monoFont,
@@ -253,42 +253,62 @@ class _MenuViewState extends State<MenuView> {
                   ),
                 ),
               )
-            else if (isMobile)
-              Column(
-                children: items.map((item) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: SizedBox(
-                      height: 340,
-                      child: ArcoProductCard(
-                        item: item,
-                        onTap: () => BuildDrinkModal.show(context, item),
-                      ),
+            else
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 240),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0.0, 0.02),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
                     ),
                   );
-                }).toList(),
-              )
-            else
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isTablet ? 2 : 3,
-                  crossAxisSpacing: 24,
-                  mainAxisSpacing: 24,
-                  childAspectRatio: isTablet ? 0.65 : 0.62,
-                ),
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  return ArcoProductCard(
-                    item: item,
-                    variant: (index == 0 && !isMobile && _selectedCategory == MenuCategory.all)
-                        ? ArcoCardVariant.featured
-                        : ArcoCardVariant.standard,
-                    onTap: () => BuildDrinkModal.show(context, item),
-                  );
                 },
+                child: KeyedSubtree(
+                  key: ValueKey<String>('menu_${_selectedCategory.name}_${items.length}'),
+                  child: isMobile
+                      ? Column(
+                          children: items.map((item) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              child: SizedBox(
+                                height: 340,
+                                child: ArcoProductCard(
+                                  item: item,
+                                  onTap: () => BuildDrinkModal.show(context, item),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        )
+                      : GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: isTablet ? 2 : 3,
+                            crossAxisSpacing: 24,
+                            mainAxisSpacing: 24,
+                            childAspectRatio: isTablet ? 0.65 : 0.62,
+                          ),
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final item = items[index];
+                            return ArcoProductCard(
+                              item: item,
+                              variant: (index == 0 && !isMobile && _selectedCategory == MenuCategory.all)
+                                  ? ArcoCardVariant.featured
+                                  : ArcoCardVariant.standard,
+                              onTap: () => BuildDrinkModal.show(context, item),
+                            );
+                          },
+                        ),
+                ),
               ),
             const SizedBox(height: 36),
 

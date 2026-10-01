@@ -34,6 +34,7 @@ class ArcoProductCard extends StatefulWidget {
 
 class _ArcoProductCardState extends State<ArcoProductCard> {
   bool _isHovered = false;
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -58,34 +59,46 @@ class _ArcoProductCardState extends State<ArcoProductCard> {
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _isPressed = false;
+      }),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
         onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: AppMotion.fast,
-          transform: Matrix4.translationValues(0, _isHovered ? -4.0 : 0.0, 0),
-          decoration: BoxDecoration(
-            color: _isHovered
-                ? (isDark ? const Color(0xFF142436) : AppColors.pureWhite)
-                : cardBg,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
+        child: AnimatedScale(
+          scale: _isPressed ? 0.985 : (_isHovered ? 1.018 : 1.0),
+          duration: _isPressed
+              ? const Duration(milliseconds: 90)
+              : const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: AppMotion.fast,
+            transform: Matrix4.translationValues(0, _isHovered ? -3.0 : 0.0, 0),
+            decoration: BoxDecoration(
               color: _isHovered
-                  ? item.accentColor.withValues(alpha: 0.6)
-                  : (isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withValues(alpha: 0.08)),
-              width: 1.0,
+                  ? (isDark ? const Color(0xFF142436) : AppColors.pureWhite)
+                  : cardBg,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: _isHovered
+                    ? item.accentColor.withValues(alpha: 0.6)
+                    : (isDark ? const Color(0x228FA2B5) : AppColors.deepBlue.withValues(alpha: 0.08)),
+                width: 1.0,
+              ),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: item.accentColor.withValues(alpha: isDark ? 0.35 : 0.2),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
+                      ),
+                    ]
+                  : AppShadows.cardShadow(isDark),
             ),
-            boxShadow: _isHovered
-                ? [
-                    BoxShadow(
-                      color: item.accentColor.withValues(alpha: isDark ? 0.35 : 0.2),
-                      blurRadius: 24,
-                      offset: const Offset(0, 10),
-                    ),
-                  ]
-                : AppShadows.cardShadow(isDark),
-          ),
           clipBehavior: Clip.antiAlias,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,18 +325,31 @@ class _ArcoProductCardState extends State<ArcoProductCard> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildFeaturedLayout(MenuItem item, ThemeController theme, bool isDark, Color cardBg) {
-    final imageAsset = item.imageAsset;
+Widget _buildFeaturedLayout(MenuItem item, ThemeController theme, bool isDark, Color cardBg) {
+  final imageAsset = item.imageAsset;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: widget.onTap,
+  return MouseRegion(
+    onEnter: (_) => setState(() => _isHovered = true),
+    onExit: (_) => setState(() {
+      _isHovered = false;
+      _isPressed = false;
+    }),
+    cursor: SystemMouseCursors.click,
+    child: GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _isPressed ? 0.985 : (_isHovered ? 1.015 : 1.0),
+        duration: _isPressed
+            ? const Duration(milliseconds: 90)
+            : const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
         child: AnimatedContainer(
           duration: AppMotion.fast,
           transform: Matrix4.translationValues(0, _isHovered ? -4.0 : 0.0, 0),
@@ -426,8 +452,9 @@ class _ArcoProductCardState extends State<ArcoProductCard> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildCompactLayout(MenuItem item, ThemeController theme, bool isDark, Color cardBg) {
     return Container(

@@ -212,7 +212,7 @@ class _AppScaffoldState extends State<AppScaffold> {
 
         return CupertinoButton(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          minSize: 44,
+          minimumSize: const Size(44, 44),
           onPressed: _openOrderModal,
           child: Stack(
             clipBehavior: Clip.none,
@@ -281,7 +281,7 @@ class _AppScaffoldState extends State<AppScaffold> {
 
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      minSize: 44,
+      minimumSize: const Size(44, 44),
       onPressed: () => _onTabSelected(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,

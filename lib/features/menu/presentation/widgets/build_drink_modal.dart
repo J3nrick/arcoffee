@@ -137,7 +137,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                           right: 14,
                           child: CupertinoButton(
                             padding: EdgeInsets.zero,
-                            minSize: 32,
+                            minimumSize: const Size(32, 32),
                             borderRadius: BorderRadius.circular(16),
                             color: AppColors.deepBlue.withValues(alpha: 0.75),
                             onPressed: () => Navigator.of(context).pop(),
@@ -249,7 +249,7 @@ class _BuildDrinkModalState extends State<BuildDrinkModal> {
                         ),
                         CupertinoButton(
                           padding: EdgeInsets.zero,
-                          minSize: 32,
+                          minimumSize: const Size(32, 32),
                           borderRadius: BorderRadius.circular(16),
                           color: isDark ? const Color(0x33FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.1),
                           onPressed: () => Navigator.of(context).pop(),

@@ -34,6 +34,7 @@ class ArcoButton extends StatefulWidget {
 
 class _ArcoButtonState extends State<ArcoButton> {
   bool _isHovered = false;
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,19 +47,23 @@ class _ArcoButtonState extends State<ArcoButton> {
 
     switch (widget.variant) {
       case ArcoButtonVariant.primary:
-        bg = _isHovered ? AppColors.accentOrange.withOpacity(0.9) : AppColors.accentOrange;
+        bg = _isHovered
+            ? AppColors.accentOrange.withValues(alpha: 0.92)
+            : AppColors.accentOrange;
         fg = AppColors.pureWhite;
         break;
       case ArcoButtonVariant.secondary:
         bg = _isHovered
-            ? (isDark ? const Color(0xFF1B3045) : AppColors.deepBlue.withOpacity(0.12))
-            : (isDark ? const Color(0xFF122334) : AppColors.deepBlue.withOpacity(0.06));
+            ? (isDark ? const Color(0xFF1B3045) : AppColors.deepBlue.withValues(alpha: 0.12))
+            : (isDark ? const Color(0xFF122334) : AppColors.deepBlue.withValues(alpha: 0.06));
         fg = isDark ? AppColors.textPrimaryNight : AppColors.deepBlue;
-        border = Border.all(color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withOpacity(0.1));
+        border = Border.all(
+          color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.1),
+        );
         break;
       case ArcoButtonVariant.ghost:
         bg = _isHovered
-            ? (isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withOpacity(0.05))
+            ? (isDark ? const Color(0x22FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.05))
             : CupertinoColors.transparent;
         fg = isDark ? AppColors.accentOrange : AppColors.deepBlue;
         break;
@@ -66,8 +71,9 @@ class _ArcoButtonState extends State<ArcoButton> {
 
     Widget content = AnimatedContainer(
       duration: AppMotion.fast,
+      curve: Curves.easeOutCubic,
       constraints: const BoxConstraints(minHeight: 44.0, minWidth: 44.0),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: AppRadii.lg,
@@ -75,8 +81,8 @@ class _ArcoButtonState extends State<ArcoButton> {
         boxShadow: (widget.variant == ArcoButtonVariant.primary && _isHovered)
             ? [
                 BoxShadow(
-                  color: AppColors.accentOrange.withOpacity(0.4),
-                  blurRadius: 14,
+                  color: AppColors.accentOrange.withValues(alpha: 0.38),
+                  blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
               ]
@@ -107,11 +113,24 @@ class _ArcoButtonState extends State<ArcoButton> {
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _isPressed = false;
+      }),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
         onTap: widget.onPressed,
-        child: content,
+        child: AnimatedScale(
+          scale: _isPressed ? 0.97 : (_isHovered ? 1.02 : 1.0),
+          duration: _isPressed
+              ? const Duration(milliseconds: 90)
+              : const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          child: content,
+        ),
       ),
     );
   }

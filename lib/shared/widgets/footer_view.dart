@@ -54,7 +54,7 @@ class FooterView extends StatelessWidget {
                 Text(
                   "© ${DateTime.now().year} Arcoffee PH. All rights reserved.",
                   style: AppTypography.footnote.copyWith(
-                    color: AppColors.textInverse.withOpacity(0.6),
+                    color: AppColors.textInverse.withValues(alpha: 0.6),
                   ),
                 ),
                 Row(
@@ -62,7 +62,7 @@ class FooterView extends StatelessWidget {
                     Text(
                       "Crafted with Apple HIG & Flutter",
                       style: AppTypography.caption2.copyWith(
-                        color: AppColors.textInverse.withOpacity(0.5),
+                        color: AppColors.textInverse.withValues(alpha: 0.5),
                       ),
                     ),
                   ],
@@ -128,7 +128,7 @@ class FooterView extends StatelessWidget {
               Text(
                 "The sports-centric coffee destination located right inside The Pickleground PH. Fueling rallies, late-night runs, and community connections.",
                 style: AppTypography.callout.copyWith(
-                  color: AppColors.textInverse.withOpacity(0.75),
+                  color: AppColors.textInverse.withValues(alpha: 0.75),
                 ),
               ),
               const SizedBox(height: 16),
@@ -152,7 +152,7 @@ class FooterView extends StatelessWidget {
               Text(
                 "NAVIGATION",
                 style: AppTypography.caption2.copyWith(
-                  color: AppColors.textInverse.withOpacity(0.5),
+                  color: AppColors.textInverse.withValues(alpha: 0.5),
                   letterSpacing: 1.2,
                 ),
               ),
@@ -174,7 +174,7 @@ class FooterView extends StatelessWidget {
               Text(
                 "OPERATING HOURS",
                 style: AppTypography.caption2.copyWith(
-                  color: AppColors.textInverse.withOpacity(0.5),
+                  color: AppColors.textInverse.withValues(alpha: 0.5),
                   letterSpacing: 1.2,
                 ),
               ),
@@ -203,7 +203,7 @@ class FooterView extends StatelessWidget {
                     child: Text(
                       "The Pickleground PH, Kawit/Noveleta, Cavite",
                       style: AppTypography.footnote.copyWith(
-                        color: AppColors.textInverse.withOpacity(0.8),
+                        color: AppColors.textInverse.withValues(alpha: 0.8),
                       ),
                     ),
                   ),
@@ -262,7 +262,7 @@ class FooterView extends StatelessWidget {
         Text(
           "OPERATING HOURS",
           style: AppTypography.caption2.copyWith(
-            color: AppColors.textInverse.withOpacity(0.5),
+            color: AppColors.textInverse.withValues(alpha: 0.5),
             letterSpacing: 1.2,
           ),
         ),
@@ -274,7 +274,7 @@ class FooterView extends StatelessWidget {
         Text(
           "LOCATION",
           style: AppTypography.caption2.copyWith(
-            color: AppColors.textInverse.withOpacity(0.5),
+            color: AppColors.textInverse.withValues(alpha: 0.5),
             letterSpacing: 1.2,
           ),
         ),
@@ -282,7 +282,7 @@ class FooterView extends StatelessWidget {
         Text(
           "The Pickleground PH, Kawit / Noveleta, Cavite",
           style: AppTypography.callout.copyWith(
-            color: AppColors.textInverse.withOpacity(0.8),
+            color: AppColors.textInverse.withValues(alpha: 0.8),
           ),
         ),
         const SizedBox(height: 20),
@@ -291,20 +291,20 @@ class FooterView extends StatelessWidget {
           children: [
             CupertinoButton(
               padding: EdgeInsets.zero,
-              minSize: 32,
+              minimumSize: const Size(32, 32),
               onPressed: () => onNavigate(1),
-              child: Text(
+              child: const Text(
                 "View Menu",
                 style: TextStyle(color: AppColors.accentOrange, fontSize: 14),
               ),
             ),
             CupertinoButton(
               padding: EdgeInsets.zero,
-              minSize: 32,
+              minimumSize: const Size(32, 32),
               onPressed: () => onNavigate(3),
               child: Text(
                 "Find Us",
-                style: TextStyle(color: AppColors.textInverse.withOpacity(0.8), fontSize: 14),
+                style: TextStyle(color: AppColors.textInverse.withValues(alpha: 0.8), fontSize: 14),
               ),
             ),
           ],
@@ -323,7 +323,7 @@ class FooterView extends StatelessWidget {
           child: Text(
             title,
             style: AppTypography.callout.copyWith(
-              color: AppColors.textInverse.withOpacity(0.8),
+              color: AppColors.textInverse.withValues(alpha: 0.8),
               fontSize: 14,
             ),
           ),
@@ -336,10 +336,10 @@ class FooterView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: isHighlight ? AppColors.accentOrange.withOpacity(0.18) : const Color(0x12FFFFFF),
+        color: isHighlight ? AppColors.accentOrange.withValues(alpha: 0.18) : const Color(0x12FFFFFF),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isHighlight ? AppColors.accentOrange.withOpacity(0.4) : const Color(0x18FFFFFF),
+          color: isHighlight ? AppColors.accentOrange.withValues(alpha: 0.4) : const Color(0x18FFFFFF),
           width: 0.8,
         ),
       ),
@@ -349,7 +349,7 @@ class FooterView extends StatelessWidget {
           Text(
             days,
             style: AppTypography.footnote.copyWith(
-              color: AppColors.textInverse.withOpacity(0.9),
+              color: AppColors.textInverse.withValues(alpha: 0.9),
               fontWeight: FontWeight.w500,
             ),
           ),

@@ -30,7 +30,7 @@ class BadgePill extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: textColor.withOpacity(0.18),
+          color: textColor.withValues(alpha: 0.18),
           width: 0.8,
         ),
       ),

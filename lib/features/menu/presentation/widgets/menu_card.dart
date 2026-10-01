@@ -75,14 +75,14 @@ class _MenuCardState extends State<MenuCard> with SingleTickerProviderStateMixin
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: _isHovered
-                    ? item.accentColor.withOpacity(0.65)
+                    ? item.accentColor.withValues(alpha: 0.65)
                     : theme.borderLight,
                 width: 1.0,
               ),
               boxShadow: _isHovered
                   ? [
                       BoxShadow(
-                        color: item.accentColor.withOpacity(isDark ? 0.45 : 0.28),
+                        color: item.accentColor.withValues(alpha: isDark ? 0.45 : 0.28),
                         blurRadius: 32,
                         spreadRadius: 2,
                         offset: const Offset(0, 14),
@@ -106,7 +106,7 @@ class _MenuCardState extends State<MenuCard> with SingleTickerProviderStateMixin
                         BadgePill(
                           label: item.category.displayName,
                           icon: item.category.icon,
-                          backgroundColor: item.accentColor.withOpacity(isDark ? 0.22 : 0.12),
+                          backgroundColor: item.accentColor.withValues(alpha: isDark ? 0.22 : 0.12),
                           textColor: item.accentColor,
                           isSmall: true,
                         ),
@@ -200,12 +200,12 @@ class _MenuCardState extends State<MenuCard> with SingleTickerProviderStateMixin
                       decoration: BoxDecoration(
                         color: _isHovered
                             ? AppColors.accentOrange
-                            : (isDark ? const Color(0x33FFFFFF) : AppColors.primaryBlue.withOpacity(0.08)),
+                            : (isDark ? const Color(0x33FFFFFF) : AppColors.primaryBlue.withValues(alpha: 0.08)),
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: _isHovered
                             ? [
                                 BoxShadow(
-                                  color: AppColors.accentOrange.withOpacity(0.4),
+                                  color: AppColors.accentOrange.withValues(alpha: 0.4),
                                   blurRadius: 12,
                                   offset: const Offset(0, 3),
                                 ),
@@ -258,15 +258,15 @@ class _MenuCardState extends State<MenuCard> with SingleTickerProviderStateMixin
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                item.accentColor.withOpacity(0.22),
-                item.accentColor.withOpacity(0.05),
+                item.accentColor.withValues(alpha: 0.22),
+                item.accentColor.withValues(alpha: 0.05),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: item.accentColor.withOpacity(0.24),
+              color: item.accentColor.withValues(alpha: 0.24),
               width: 0.8,
             ),
           ),
@@ -278,7 +278,7 @@ class _MenuCardState extends State<MenuCard> with SingleTickerProviderStateMixin
                 child: Icon(
                   CupertinoIcons.circle_grid_hex_fill,
                   size: 80,
-                  color: item.accentColor.withOpacity(0.09),
+                  color: item.accentColor.withValues(alpha: 0.09),
                 ),
               ),
               Center(
@@ -291,11 +291,11 @@ class _MenuCardState extends State<MenuCard> with SingleTickerProviderStateMixin
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: AppColors.pureWhite.withOpacity(0.92),
+                          color: AppColors.pureWhite.withValues(alpha: 0.92),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: item.accentColor.withOpacity(0.4),
+                              color: item.accentColor.withValues(alpha: 0.4),
                               blurRadius: _isHovered ? 18 : 10,
                               spreadRadius: _isHovered ? 2 : 0,
                               offset: const Offset(0, 4),

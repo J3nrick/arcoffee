@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
@@ -14,7 +13,7 @@ class MenuDetailSheet extends StatelessWidget {
   static void show(BuildContext context, MenuItem item) {
     showCupertinoModalPopup<void>(
       context: context,
-      barrierColor: AppColors.deepNavy.withOpacity(0.4),
+      barrierColor: AppColors.deepNavy.withValues(alpha: 0.4),
       builder: (ctx) => MenuDetailSheet(item: item),
     );
   }
@@ -35,7 +34,7 @@ class MenuDetailSheet extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.deepNavy.withOpacity(0.2),
+                color: AppColors.deepNavy.withValues(alpha: 0.2),
                 blurRadius: 36,
                 offset: const Offset(0, 16),
               ),
@@ -52,8 +51,8 @@ class MenuDetailSheet extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      item.accentColor.withOpacity(0.35),
-                      item.accentColor.withOpacity(0.08),
+                      item.accentColor.withValues(alpha: 0.35),
+                      item.accentColor.withValues(alpha: 0.08),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -67,9 +66,9 @@ class MenuDetailSheet extends StatelessWidget {
                       right: 14,
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
-                        minSize: 32,
+                        minimumSize: const Size(32, 32),
                         borderRadius: BorderRadius.circular(16),
-                        color: AppColors.deepNavy.withOpacity(0.12),
+                        color: AppColors.deepNavy.withValues(alpha: 0.12),
                         onPressed: () => Navigator.of(context).pop(),
                         child: const Icon(
                           CupertinoIcons.xmark,
@@ -90,7 +89,7 @@ class MenuDetailSheet extends StatelessWidget {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: item.accentColor.withOpacity(0.3),
+                                  color: item.accentColor.withValues(alpha: 0.3),
                                   blurRadius: 16,
                                   offset: const Offset(0, 4),
                                 ),
@@ -105,7 +104,7 @@ class MenuDetailSheet extends StatelessWidget {
                           const SizedBox(height: 8),
                           BadgePill(
                             label: item.category.displayName.toUpperCase(),
-                            backgroundColor: item.accentColor.withOpacity(0.18),
+                            backgroundColor: item.accentColor.withValues(alpha: 0.18),
                             textColor: item.accentColor,
                             isSmall: true,
                           ),
@@ -186,7 +185,7 @@ class MenuDetailSheet extends StatelessWidget {
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryBlue.withOpacity(0.06),
+                              color: AppColors.primaryBlue.withValues(alpha: 0.06),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(

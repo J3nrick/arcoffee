@@ -38,7 +38,7 @@ class FrostedGlassContainer extends StatelessWidget {
             ? [shadow!]
             : [
                 BoxShadow(
-                  color: AppColors.primaryBlue.withOpacity(0.04),
+                  color: AppColors.primaryBlue.withValues(alpha: 0.04),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),

@@ -304,7 +304,7 @@ class _SplashScreenState extends State<SplashScreen>
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontFamily: 'JetBrains Mono',
-                              fontFamilyFallback: [
+                              fontFamilyFallback: const [
                                 'SF Mono',
                                 'Menlo',
                                 'Monaco',

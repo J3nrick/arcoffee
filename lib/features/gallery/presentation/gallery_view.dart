@@ -148,7 +148,7 @@ class _GalleryViewState extends State<GalleryView> {
                       children: [
                         Text(
                           photo['caption']!,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontFamily: AppTypography.scoreboardFont,
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
@@ -159,7 +159,7 @@ class _GalleryViewState extends State<GalleryView> {
                         const SizedBox(height: 4),
                         Text(
                           photo['story']!,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontFamily: AppTypography.bodyFont,
                             fontSize: 13,
                             color: AppColors.pureWhite,
@@ -237,7 +237,7 @@ class _GalleryViewState extends State<GalleryView> {
                     ),
                   ),
                 ),
-                Text(
+                const Text(
                   "[ EXPAND FULLSCREEN ]",
                   style: TextStyle(
                     fontFamily: AppTypography.monoFont,

@@ -164,7 +164,7 @@ class _CourtSideDeliveryModalState extends State<CourtSideDeliveryModal> {
           ),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            minSize: 32,
+            minimumSize: const Size(32, 32),
             borderRadius: BorderRadius.circular(16),
             color: isDark ? const Color(0x33FFFFFF) : AppColors.deepBlue.withValues(alpha: 0.08),
             onPressed: () => Navigator.of(context).pop(),
@@ -377,7 +377,7 @@ class _CourtSideDeliveryModalState extends State<CourtSideDeliveryModal> {
                     children: [
                       CupertinoButton(
                         padding: EdgeInsets.zero,
-                        minSize: 28,
+                        minimumSize: const Size(28, 28),
                         onPressed: () => tray.updateQuantity(item.id, -1),
                         child: Container(
                           width: 24,
@@ -403,7 +403,7 @@ class _CourtSideDeliveryModalState extends State<CourtSideDeliveryModal> {
                       ),
                       CupertinoButton(
                         padding: EdgeInsets.zero,
-                        minSize: 28,
+                        minimumSize: const Size(28, 28),
                         onPressed: () => tray.updateQuantity(item.id, 1),
                         child: Container(
                           width: 24,
@@ -422,7 +422,7 @@ class _CourtSideDeliveryModalState extends State<CourtSideDeliveryModal> {
                   // Item Price
                   Text(
                     "₱${item.totalPrice.toStringAsFixed(0)}",
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: AppTypography.monoFont,
                       fontFamilyFallback: AppTypography.monoFontFallback,
                       fontWeight: FontWeight.w800,

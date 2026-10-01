@@ -5,17 +5,17 @@ import 'app_colors.dart';
 abstract class AppShadows {
   static List<BoxShadow> cardShadow(bool isDark) {
     if (isDark) {
-      return [
+      return const [
         BoxShadow(
-          color: const Color(0x66000000),
+          color: Color(0x66000000),
           blurRadius: 20,
-          offset: const Offset(0, 6),
+          offset: Offset(0, 6),
         ),
       ];
     }
     return [
       BoxShadow(
-        color: AppColors.deepBlue.withOpacity(0.06),
+        color: AppColors.deepBlue.withValues(alpha: 0.06),
         blurRadius: 18,
         offset: const Offset(0, 6),
       ),
@@ -24,17 +24,17 @@ abstract class AppShadows {
 
   static List<BoxShadow> floatingNavShadow(bool isDark) {
     if (isDark) {
-      return [
+      return const [
         BoxShadow(
-          color: const Color(0x80000000),
+          color: Color(0x80000000),
           blurRadius: 28,
-          offset: const Offset(0, 10),
+          offset: Offset(0, 10),
         ),
       ];
     }
     return [
       BoxShadow(
-        color: AppColors.deepBlue.withOpacity(0.08),
+        color: AppColors.deepBlue.withValues(alpha: 0.08),
         blurRadius: 24,
         offset: const Offset(0, 8),
       ),
@@ -43,7 +43,7 @@ abstract class AppShadows {
 
   static List<BoxShadow> orangeGlow = [
     BoxShadow(
-      color: AppColors.accentOrange.withOpacity(0.35),
+      color: AppColors.accentOrange.withValues(alpha: 0.35),
       blurRadius: 16,
       offset: const Offset(0, 4),
     ),
