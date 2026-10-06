@@ -119,7 +119,7 @@ All repositories are defined as abstract contracts (`MenuRepository`, `StoreRepo
 final menuRepository = LaravelRestMenuRepository(baseUrl: 'https://api.arcoffee.ph/v1');
 ```
 
-Refer to [ARCHITECTURE.md](file:///c:/Users/Jenrick%20Ambalong/Pictures/Screenshots/Arcoffee/ARCHITECTURE.md) for full architectural documentation.
+Refer to [endpoints.md](file:///c:/Users/Jenrick%20Ambalong/Pictures/Screenshots/Arcoffee/endpoints.md) for full PHP Laravel REST API contract specifications and JSON schemas, and [ARCHITECTURE.md](file:///c:/Users/Jenrick%20Ambalong/Pictures/Screenshots/Arcoffee/ARCHITECTURE.md) for full architectural documentation.
 
 ---
 

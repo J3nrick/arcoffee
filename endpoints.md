@@ -13,7 +13,22 @@ This document details the expected JSON payload contracts, HTTP methods, query p
   Content-Type: application/json
   X-Requested-With: XMLHttpRequest
   X-Client-Platform: Flutter-Web-Cupertino
-  X-App-Version: 1.0.0
+  X-App-Version: 1.0.1
+  ```
+
+* **Standard HTTP Response Codes:**
+  | Status Code | Description | Payload Structure |
+  | :--- | :--- | :--- |
+  | `200 OK` | Request succeeded | `{ "data": ... }` |
+  | `400 Bad Request` | Invalid query or payload formatting | `{ "message": "Invalid request parameter." }` |
+  | `404 Not Found` | Requested resource does not exist | `{ "message": "Resource not found." }` |
+  | `429 Too Many Requests` | Rate limit exceeded (60 req/min) | `{ "message": "Too many requests. Please try again later." }` |
+  | `500 Server Error` | Backend server error | `{ "message": "Internal server error." }` |
+
+* **Rate Limiting Headers:**
+  ```http
+  X-RateLimit-Limit: 60
+  X-RateLimit-Remaining: 59
   ```
 
 ---
