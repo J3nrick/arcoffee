@@ -13,5 +13,5 @@
 ## Reduced Motion Support (`prefers-reduced-motion`)
 When `MediaQuery.of(context).disableAnimations` is true:
 * Slide transitions are disabled.lll
-* Scale and matrix transforms are suppressed.
+* Scale and matrix transforms are suppressed....
 * Fade and color state transitions remain instantaneous for clear feedback.

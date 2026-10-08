@@ -13,7 +13,7 @@ This document details the expected JSON payload contracts, HTTP methods, query p
   Content-Type: application/json
   X-Requested-With: XMLHttpRequest
   X-Client-Platform: Flutter-Web-Cupertino
-  X-App-Version: 1.0.1
+  X-App-Version: 1.0.1....
   ```
 
 * **Standard HTTP Response Codes:**
