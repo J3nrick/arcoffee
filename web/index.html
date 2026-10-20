@@ -73,8 +73,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: var(--brand-cream);
-      color: var(--brand-blue);
+      background: #07111D;
+      color: var(--brand-cream);
       transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease;
       opacity: 1;
       visibility: visible;
@@ -86,17 +86,27 @@
       visibility: hidden;
       pointer-events: none;
     }
-    .brand-logo-img {
-      height: 56px;
-      width: auto;
-      max-width: 180px;
-      object-fit: contain;
+    /* The ball waiting to be served; Flutter's splash takes over the lob. */
+    .serve-ball {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--brand-cream);
+      box-shadow: 0 0 24px 6px rgba(243, 102, 34, 0.35);
+      animation: serve 1.4s ease-in-out infinite;
+    }
+    @keyframes serve {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .serve-ball { animation: none; }
     }
   </style>
 </head>
 <body>
   <div id="loading">
-    <img src="logo.png" alt="ARCOFFEE Logo" class="brand-logo-img" />
+    <div class="serve-ball" role="img" aria-label="Arcoffee is loading"></div>
   </div>
 
   <script>

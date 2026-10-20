@@ -1,684 +1,556 @@
+import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/design/app_breakpoints.dart';
 import '../../../core/design/app_colors.dart';
 import '../../../core/design/app_motion.dart';
 import '../../../core/design/app_typography.dart';
-import '../../../shared/components/arco_button.dart';
-import '../../../shared/components/arco_court_line.dart';
-import '../../../shared/components/arco_logo.dart';
+import '../../../data/models/menu_item.dart';
+import '../../../shared/components/arco_arch.dart';
+import '../../../shared/components/arco_text_link.dart';
 import '../../../theme/theme_controller.dart';
+import '../../court_card/presentation/drink_sheet.dart';
 
-/// Editorial Asymmetrical Hero Section for Arcoffee.
-/// Implements the exact 45% (Story) / 55% (Photography) layout blueprint
-/// with zero emojis, full-bleed coffee campaign photo, and overlapping brand sticker.
+/// Signature Stage: one drink at a time, its name set enormous and thin behind
+/// an arch-framed photograph under a court-light glow. The orange arc around
+/// the arch doubles as the timer before the next signature drink takes the stage.
 class HomeHeroSection extends StatefulWidget {
+  final List<MenuItem> items;
   final VoidCallback onExploreMenu;
-  final VoidCallback onViewLocation;
 
-  const HomeHeroSection({
-    super.key,
-    required this.onExploreMenu,
-    required this.onViewLocation,
-  });
+  const HomeHeroSection({super.key, required this.items, required this.onExploreMenu});
 
   @override
   State<HomeHeroSection> createState() => _HomeHeroSectionState();
 }
 
-class _HomeHeroSectionState extends State<HomeHeroSection> with SingleTickerProviderStateMixin {
-  late final AnimationController _animController;
-  late final Animation<double> _fadeIn;
-  late final Animation<Offset> _slideUp;
-
-  // Curated hero photography: Curated authentic courtside shots
-  int _activeHeroPhotoIndex = 0;
-
-  static const List<Map<String, String>> _heroPhotos = [
-    {
-      'asset': 'assets/images/milo_overload_court.png',
-      'num': '01',
-      'title': 'MILO OVERLOAD ON COURT BASELINE',
-      'caption': 'THE PICKLEGROUND PH • COURT BASELINE',
-      'story': 'Signature chilled malt beverage topped with thick Milo powder overload, shot courtside at The Pickleground PH.',
-    },
-    {
-      'asset': 'assets/images/court_arena_drink.jpg',
-      'num': '02',
-      'title': 'INDOOR ARENA & ESPRESSO BAR',
-      'caption': 'THE PICKLEGROUND PH • KAWIT ARENA',
-      'story': 'Full view of the active indoor pickleball tournament courts and the Arcoffee espresso bar in Kawit, Cavite.',
-    },
-    {
-      'asset': 'assets/images/green_apple_court_line.jpg',
-      'num': '03',
-      'title': 'GREEN APPLE CRAFT SODA',
-      'caption': 'COURT NON-VOLLEY LINE • CHILLED',
-      'story': 'Crisp, sparkling house-crafted green apple soda served ice-cold directly on the tournament court line.',
-    },
-    {
-      'asset': 'assets/images/lychee_soda_chat_paddle.jpg',
-      'num': '04',
-      'title': 'POST-RALLY CHAT & PADDLE',
-      'caption': 'COMMUNITY BENCH • SIDELINE SESSIONS',
-      'story': 'Arcoffee refreshing sparkling lychee soda on the player bench beside a graphite pickleball paddle after an intense rally.',
-    },
+class _HomeHeroSectionState extends State<HomeHeroSection> with TickerProviderStateMixin {
+  // (menu item name, stage word)
+  static const List<(String, String)> _stageSpec = [
+    ('Spanish Latte', 'Spanish'),
+    ('Mango Americano', 'Mango'),
+    ('Milo Overload', 'Milo'),
+    ('Haw-Haw Matcha', 'Matcha'),
   ];
+  static const Duration _plateDuration = Duration(milliseconds: 6500);
 
-  void _openHeroLightbox(BuildContext context, int index) {
-    final photo = _heroPhotos[index];
-    showCupertinoModalPopup<void>(
-      context: context,
-      barrierColor: const Color(0xE607111D),
-      builder: (ctx) {
-        return Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 880, maxHeight: 720),
-            child: Container(
-              margin: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F1B28),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.accentOrange.withValues(alpha: 0.4),
-                  width: 1.2,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    InteractiveViewer(
-                      minScale: 1.0,
-                      maxScale: 3.5,
-                      child: Center(
-                        child: Image.asset(
-                          photo['asset']!,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(36, 36),
-                        borderRadius: BorderRadius.circular(18),
-                        color: AppColors.deepBlue.withValues(alpha: 0.8),
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Icon(
-                          CupertinoIcons.xmark,
-                          color: AppColors.pureWhite,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 20,
-                      left: 20,
-                      right: 20,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.deepBlue.withValues(alpha: 0.88),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.accentOrange.withValues(alpha: 0.4),
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              photo['title']!,
-                              style: const TextStyle(
-                                fontFamily: AppTypography.scoreboardFont,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.0,
-                                color: AppColors.accentOrange,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              photo['story']!,
-                              style: const TextStyle(
-                                fontFamily: AppTypography.bodyFont,
-                                fontSize: 13,
-                                color: AppColors.pureWhite,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  late final AnimationController _intro = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+  late final AnimationController _plate = AnimationController(vsync: this, duration: _plateDuration);
+  Timer? _advance;
+  int _active = 0;
+
+  List<(MenuItem, String)> get _stage => [
+        for (final s in _stageSpec)
+          for (final item in widget.items)
+            if (item.name == s.$1) (item, s.$2),
+      ];
 
   @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (AppMotion.isReducedMotion(context)) {
+      _advance?.cancel();
+      _plate.value = 1;
+      _intro.value = 1;
+    } else if (_intro.value == 0 && !_intro.isAnimating) {
+      _intro.forward();
+      _startPlate();
+    }
+  }
 
-    _fadeIn = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOutCubic,
-    );
+  void _startPlate() {
+    _plate.forward(from: 0);
+    _advance?.cancel();
+    _advance = Timer(_plateDuration, () {
+      final n = _stage.length;
+      if (mounted && n > 0) _select((_active + 1) % n);
+    });
+  }
 
-    _slideUp = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _animController.forward();
+  void _select(int i) {
+    setState(() => _active = i);
+    if (!AppMotion.isReducedMotion(context)) _startPlate();
   }
 
   @override
   void dispose() {
-    _animController.dispose();
+    _advance?.cancel();
+    _intro.dispose();
+    _plate.dispose();
     super.dispose();
+  }
+
+  Widget _reveal(Widget child, double start) {
+    final curve = CurvedAnimation(
+      parent: _intro,
+      curve: Interval(start, (start + 0.5).clamp(0.0, 1.0), curve: Curves.easeOutCubic),
+    );
+    return AnimatedBuilder(
+      animation: curve,
+      child: child,
+      builder: (context, child) => Opacity(
+        opacity: curve.value,
+        child: Transform.translate(offset: Offset(0, 24 * (1 - curve.value)), child: child),
+      ),
+    );
+  }
+
+  static String _fromPrice(MenuItem i) {
+    final p = [i.hotPrice, i.price16oz, i.price].whereType<double>().reduce(math.min);
+    return '₱${p.toStringAsFixed(0)}';
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeScope.of(context);
-    final isDark = theme.isMidnightCourt;
+    final stage = _stage;
+    final width = MediaQuery.sizeOf(context).width;
     final isDesktop = AppBreakpoints.isDesktop(context);
-    final horizontalPad = AppBreakpoints.horizontalPadding(context);
-    final isReducedMotion = AppMotion.isReducedMotion(context);
+    final pad = AppBreakpoints.horizontalPadding(context);
 
-    Widget content = Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPad,
-        vertical: isDesktop ? 56.0 : 28.0,
-      ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: AppBreakpoints.desktopMax),
-        child: isDesktop
-            ? _buildDesktopAsymmetricHero(theme, isDark)
-            : _buildMobileEditorialHero(theme, isDark),
-      ),
-    );
+    if (stage.isEmpty) return SizedBox(height: isDesktop ? 760 : 900);
+    final active = _active.clamp(0, stage.length - 1);
+    final (item, word) = stage[active];
 
-    if (isReducedMotion) return content;
-
-    return FadeTransition(
-      opacity: _fadeIn,
-      child: SlideTransition(
-        position: _slideUp,
-        child: content,
-      ),
-    );
+    return isDesktop ? _desktop(item, word, stage, width, pad) : _compact(item, word, stage, width, pad);
   }
 
-  /// 45% (Text) / 55% (Image) Asymmetrical Desktop Layout
-  Widget _buildDesktopAsymmetricHero(ThemeController theme, bool isDark) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // LEFT COLUMN (45% Width): Story, Metadata, Bold Typography, CTAs
-        Expanded(
-          flex: 45,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Brand Monospaced Metadata & Logo Mark
-              Row(
-                children: [
-                  ArcoLogo(
-                    height: 20,
-                    showText: false,
-                    color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    "AR / 001   |   THE PICKLEGROUND PH",
-                    style: AppTypography.scoreboard.copyWith(
-                      fontSize: 12,
-                      letterSpacing: 1.5,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              ArcoCourtLine(
-                width: 240,
-                height: 1.2,
-                color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
-              ),
-              const SizedBox(height: 28),
+  // ---------------------------------------------------------------- desktop
 
-              // Massive Editorial Headline (Graphic Element)
-              Text(
-                "COFFEE,\nCOURT-SIDE.",
-                style: AppTypography.displayXL.copyWith(
-                  fontSize: 68,
-                  height: 0.96,
-                  letterSpacing: -2.2,
-                  fontWeight: FontWeight.w900,
-                  color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // Tagline
-              Text(
-                "“${AppConstants.slogan}”",
-                style: AppTypography.bodyLarge.copyWith(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  fontStyle: FontStyle.italic,
-                  color: AppColors.accentOrange,
-                ),
-              ),
-              const SizedBox(height: 14),
-
-              // Editorial Narrative Description with Swiss 60ch Measure
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: Text(
-                  "Craft specialty coffee, non-coffee overloads & ice-cold sodas served directly alongside the pickleball courts in Kawit, Cavite.",
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontSize: 16,
-                    height: 1.5,
-                    color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 36),
-
-              // Action Buttons
-              Row(
-                children: [
-                  ArcoButton(
-                    text: "Explore Menu →",
-                    onPressed: widget.onExploreMenu,
-                    variant: ArcoButtonVariant.primary,
-                  ),
-                  const SizedBox(width: 16),
-                  ArcoButton(
-                    text: "Location & Hours",
-                    onPressed: widget.onViewLocation,
-                    variant: ArcoButtonVariant.secondary,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(width: 48),
-
-        // RIGHT COLUMN (55% Width): Massive Editorial Photograph & Overlapping Brand Sticker
-        Expanded(
-          flex: 55,
-          child: _buildEditorialPhotoFocalPoint(theme, isDark, height: 460),
-        ),
-      ],
-    );
-  }
-
-  /// Mobile Stacked Editorial Composition
-  Widget _buildMobileEditorialHero(ThemeController theme, bool isDark) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Brand Monospaced Metadata & Logo Mark
-        Row(
-          children: [
-            ArcoLogo(
-              height: 18,
-              showText: false,
-              color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              "AR / 001   |   THE PICKLEGROUND PH",
-              style: AppTypography.scoreboard.copyWith(
-                fontSize: 11,
-                letterSpacing: 1.2,
-                fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        ArcoCourtLine(
-          width: 180,
-          height: 1.0,
-          color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
-        ),
-        const SizedBox(height: 20),
-
-        // Headline
-        Text(
-          "COFFEE,\nCOURT-SIDE.",
-          style: AppTypography.displayXL.copyWith(
-            fontSize: 42,
-            height: 0.98,
-            letterSpacing: -1.4,
-            color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // Tagline
-        Text(
-          "“${AppConstants.slogan}”",
-          style: AppTypography.body.copyWith(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontStyle: FontStyle.italic,
-            color: AppColors.accentOrange,
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        // Photography Focal Point
-        _buildEditorialPhotoFocalPoint(theme, isDark, height: 260),
-        const SizedBox(height: 20),
-
-        // Description
-        Text(
-          "Craft specialty coffee, non-coffee overloads & ice-cold sodas served directly alongside the courts in Kawit, Cavite.",
-          style: AppTypography.body.copyWith(
-            color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
-          ),
-        ),
-        const SizedBox(height: 28),
-
-        // Full-width buttons for mobile
-        Row(
-          children: [
-            Expanded(
-              child: ArcoButton(
-                text: "Explore Menu →",
-                onPressed: widget.onExploreMenu,
-                variant: ArcoButtonVariant.primary,
-                isFullWidth: true,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ArcoButton(
-                text: "Location",
-                onPressed: widget.onViewLocation,
-                variant: ArcoButtonVariant.secondary,
-                isFullWidth: true,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  /// Right-side Full-Bleed Editorial Photograph with Overlapping Tilted Sticker & Switcher
-  Widget _buildEditorialPhotoFocalPoint(ThemeController theme, bool isDark, {required double height}) {
-    final activePhoto = _heroPhotos[_activeHeroPhotoIndex];
+  Widget _desktop(MenuItem item, String word, List<(MenuItem, String)> stage, double width, double pad) {
+    final theme = ThemeScope.of(context);
+    final fs = (width * 0.17).clamp(120.0, 270.0);
+    final archW = (width * 0.22).clamp(260.0, 330.0);
+    final archH = archW * 1.38;
+    const wordTop = 64.0;
+    final archTop = wordTop + fs * 0.62;
+    final height = archTop + archH + 120;
+    final sideW = (width / 2 - archW / 2 - pad - 56).clamp(220.0, 400.0);
+    // Side columns start below the stage word's baseline so they never collide with it.
+    final sideTop = math.max(archTop + archH * 0.2, wordTop + fs * 0.98 + 24);
 
     return SizedBox(
       height: height,
+      width: double.infinity,
       child: Stack(
-        clipBehavior: Clip.none,
+        clipBehavior: Clip.hardEdge,
         children: [
-          // Main Full-Bleed Photograph with Interactive Tap-to-Enlarge
-          Positioned.fill(
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => _openHeroLightbox(context, _activeHeroPhotoIndex),
-                child: Container(
+          Positioned(
+            top: 26,
+            left: 0,
+            right: 0,
+            child: _reveal(_kicker(theme), 0),
+          ),
+          Positioned(top: wordTop, left: 0, right: 0, child: _reveal(_stageWord(word, fs, theme), 0.08)),
+          // Vertical outlined wordmark along the right edge.
+          Positioned(
+            right: pad * 0.35,
+            top: archTop - 10,
+            child: RotatedBox(
+              quarterTurns: 1,
+              child: ArcoOutlineText('ARCOFFEE', fontSize: 92, color: theme.primaryText.withValues(alpha: 0.14)),
+            ),
+          ),
+          Positioned(
+            top: archTop - archW * 0.2,
+            left: width / 2 - archW * 0.95,
+            width: archW * 1.9,
+            height: archH + archW * 0.4,
+            child: _reveal(_stagePhoto(item, archW, archH), 0.18),
+          ),
+          Positioned(
+            left: pad,
+            top: sideTop,
+            width: sideW,
+            child: _reveal(_story(item, theme), 0.3),
+          ),
+          Positioned(
+            right: pad + 96,
+            top: sideTop,
+            width: math.min(sideW, 280),
+            child: _reveal(_specs(item, theme), 0.36),
+          ),
+          Positioned(
+            left: pad,
+            right: pad,
+            bottom: 36,
+            child: _reveal(_index(stage, theme), 0.44),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- phone / tablet
+
+  Widget _compact(MenuItem item, String word, List<(MenuItem, String)> stage, double width, double pad) {
+    final theme = ThemeScope.of(context);
+    final fs = (width * 0.22).clamp(72.0, 170.0);
+    final archW = (width * 0.56).clamp(200.0, 320.0);
+    final archH = archW * 1.36;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(pad, 24, pad, 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _reveal(_kicker(theme), 0),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: fs * 0.62 + archH + archW * 0.1,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(top: 0, left: -pad, right: -pad, child: _reveal(_stageWord(word, fs, theme), 0.08)),
+                Positioned(
+                  top: fs * 0.62 - archW * 0.2,
+                  left: (width - 2 * pad) / 2 - archW * 0.95,
+                  width: archW * 1.9,
+                  height: archH + archW * 0.4,
+                  child: _reveal(_stagePhoto(item, archW, archH, sealSize: 84), 0.18),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 28),
+          _reveal(_story(item, theme), 0.3),
+          const SizedBox(height: 32),
+          _reveal(_specs(item, theme, horizontal: width >= 480), 0.36),
+          const SizedBox(height: 32),
+          _reveal(_index(stage, theme, compact: true), 0.44),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- pieces
+
+  Widget _kicker(ThemeController theme) => Text(
+        'POURED COURTSIDE  ·  THE PICKLEGROUND PH  ·  KAWIT, CAVITE',
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: AppTypography.scoreboard.copyWith(
+          fontSize: 11,
+          letterSpacing: 2.2,
+          fontWeight: FontWeight.w700,
+          color: AppColors.accentOrange,
+        ),
+      );
+
+  Widget _stageWord(String word, double fs, ThemeController theme) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 700),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, anim) => FadeTransition(
+        opacity: anim,
+        child: SlideTransition(
+          position: Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero).animate(anim),
+          child: child,
+        ),
+      ),
+      child: Text(
+        word,
+        key: ValueKey(word),
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        softWrap: false,
+        overflow: TextOverflow.visible,
+        style: AppTypography.displayXL.copyWith(
+          fontSize: fs,
+          height: 1,
+          fontWeight: FontWeight.w200,
+          fontVariations: const [FontVariation('wght', 200)],
+          letterSpacing: -fs * 0.045,
+          color: theme.primaryText,
+        ),
+      ),
+    );
+  }
+
+  /// Arch photograph with its court-light glow, timer arc and seal. Box is archW*1.9 wide.
+  Widget _stagePhoto(MenuItem item, double archW, double archH, {double sealSize = 112}) {
+    return LayoutBuilder(
+      builder: (context, box) {
+        final cx = box.maxWidth / 2;
+        final top = archW * 0.2;
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Court-light glow behind the cup.
+            Positioned(
+              left: cx - archW * 0.95,
+              top: top + archH * 0.05,
+              width: archW * 1.9,
+              height: archW * 1.9,
+              child: IgnorePointer(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.deepBlue.withValues(alpha: isDark ? 0.45 : 0.14),
-                        blurRadius: 28,
-                        offset: const Offset(0, 14),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 350),
-                          switchInCurve: Curves.easeOut,
-                          switchOutCurve: Curves.easeIn,
-                          child: SizedBox.expand(
-                            key: ValueKey<String>(activePhoto['asset']!),
-                            child: Image.asset(
-                              activePhoto['asset']!,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.center,
-                            ),
-                          ),
-                        ),
-                        // Subtle bottom gradient vignette for metadata contrast
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: 110,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  AppColors.deepBlue.withValues(alpha: 0.88),
-                                  AppColors.deepBlue.withValues(alpha: 0.0),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Top bar: Editorial Photo Carousel Switcher Tabs (01, 02, 03, 04)
-                        Positioned(
-                          top: 14,
-                          right: 14,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.deepBlue.withValues(alpha: 0.85),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: isDark ? const Color(0x33FFFFFF) : AppColors.softSand.withValues(alpha: 0.3),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: List.generate(_heroPhotos.length, (idx) {
-                                final isSelected = idx == _activeHeroPhotoIndex;
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _activeHeroPhotoIndex = idx;
-                                    });
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? AppColors.accentOrange : CupertinoColors.transparent,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      _heroPhotos[idx]['num']!,
-                                      style: TextStyle(
-                                        fontFamily: AppTypography.monoFont,
-                                        fontFamilyFallback: AppTypography.monoFontFallback,
-                                        fontSize: 11,
-                                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                                        color: isSelected ? AppColors.pureWhite : AppColors.softSand,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ),
-                        ),
-                        // Top Left: Expand Indicator
-                        Positioned(
-                          top: 14,
-                          left: 14,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.deepBlue.withValues(alpha: 0.8),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Text(
-                              "[ VIEW FULLSCREEN ]",
-                              style: TextStyle(
-                                fontFamily: AppTypography.monoFont,
-                                fontFamilyFallback: AppTypography.monoFontFallback,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
-                                color: AppColors.accentOrange,
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Bottom Metadata Caption on Image
-                        Positioned(
-                          bottom: 16,
-                          right: 18,
-                          left: 90,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                activePhoto['title']!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontFamily: AppTypography.scoreboardFont,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.8,
-                                  color: AppColors.accentOrange,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                activePhoto['caption']!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTypography.receipt.copyWith(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.6,
-                                  color: AppColors.pureWhite,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.accentOrange.withValues(alpha: 0.32),
+                        AppColors.accentOrange.withValues(alpha: 0.0),
                       ],
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-
-          // Tilted Brand Sticker Overlapping the Left Edge
-          Positioned(
-            bottom: -14,
-            left: -14,
-            child: Transform.rotate(
-              angle: -0.04,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.accentOrange,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.deepBlue.withValues(alpha: 0.28),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+            // Timer arc: hugs the arch head and fills while this drink holds the stage.
+            Positioned(
+              left: cx - archW / 2 - 18,
+              top: top - 18,
+              width: archW + 36,
+              height: archW + 36,
+              child: AnimatedBuilder(
+                animation: _plate,
+                builder: (context, _) => CustomPaint(
+                  painter: ArcoArcStroke(
+                    progress: _plate.value,
+                    startAngle: math.pi,
+                    sweep: math.pi,
+                    strokeWidth: 2,
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const ArcoLogo(
-                      height: 18,
-                      showText: false,
-                      color: AppColors.pureWhite,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      "PLAY.",
-                      style: AppTypography.scoreboard.copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.pureWhite,
-                        letterSpacing: 1.0,
-                        height: 1.1,
+              ),
+            ),
+            Positioned(
+              left: cx - archW / 2,
+              top: top,
+              width: archW,
+              height: archH,
+              child: Semantics(
+                button: true,
+                label: 'View ${item.name}',
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => DrinkSheet.show(context, item),
+                    child: ArcoArch(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 800),
+                        switchInCurve: Curves.easeOutCubic,
+                        transitionBuilder: (child, anim) => FadeTransition(
+                          opacity: anim,
+                          child: ScaleTransition(
+                            scale: Tween<double>(begin: 1.08, end: 1).animate(anim),
+                            child: child,
+                          ),
+                        ),
+                        layoutBuilder: (current, previous) => Stack(
+                          fit: StackFit.expand,
+                          children: [...previous, if (current != null) current],
+                        ),
+                        child: Image.asset(
+                          item.imageAsset ?? 'assets/images/espresso_pour_latte.jpg',
+                          key: ValueKey(item.id),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                    Text(
-                      "SIP.",
-                      style: AppTypography.scoreboard.copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.pureWhite,
-                        letterSpacing: 1.0,
-                        height: 1.1,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: cx + archW / 2 - sealSize * 0.55,
+              top: top - sealSize * 0.1,
+              child: ArcoSeal(
+                text: "IT'S ALWAYS BEEN OURS  ·  ARCOFFEE  ·  ",
+                size: sealSize,
+                color: ThemeScope.of(context).primaryText,
+                background: ThemeScope.of(context).scaffoldBackground,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _story(MenuItem item, ThemeController theme) {
+    return AnimatedSwitcher(
+      duration: AppMotion.emphasis,
+      child: Column(
+        key: ValueKey(item.id),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            item.name,
+            style: AppTypography.headingXL.copyWith(
+              fontSize: 26,
+              height: 1.1,
+              letterSpacing: -0.6,
+              fontWeight: FontWeight.w800,
+              color: theme.primaryText,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            item.description,
+            style: AppTypography.body.copyWith(fontSize: 15, height: 1.6, color: theme.secondaryText),
+          ),
+          const SizedBox(height: 28),
+          Wrap(
+            spacing: 24,
+            runSpacing: 10,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              CourtCardSaveButton(item: item),
+              ArcoTextLink(label: 'Full menu', color: theme.primaryText, onTap: widget.onExploreMenu),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _specs(MenuItem item, ThemeController theme, {bool horizontal = false}) {
+    final rows = [
+      ('SERIES', item.category.displayName),
+      ('ENERGY', item.caffeineNote),
+      ('SIZE', item.size),
+    ];
+    Widget row(int i) => Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 30,
+              height: 30,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.accentOrange, width: 1.2),
+              ),
+              child: Text(
+                '0${i + 1}',
+                style: AppTypography.scoreboard.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.accentOrange),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    rows[i].$1,
+                    style: AppTypography.scoreboard.copyWith(
+                      fontSize: 10,
+                      letterSpacing: 1.8,
+                      fontWeight: FontWeight.w700,
+                      color: theme.tertiaryText,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    rows[i].$2,
+                    style: AppTypography.body.copyWith(fontSize: 15, fontWeight: FontWeight.w600, color: theme.primaryText),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+
+    final price = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'FROM',
+          style: AppTypography.scoreboard.copyWith(fontSize: 10, letterSpacing: 1.8, fontWeight: FontWeight.w700, color: theme.tertiaryText),
+        ),
+        Text(
+          _fromPrice(item),
+          style: AppTypography.displayXL.copyWith(
+            fontSize: 44,
+            height: 1.1,
+            letterSpacing: -1.2,
+            fontWeight: FontWeight.w800,
+            color: theme.primaryText,
+          ),
+        ),
+      ],
+    );
+
+    return AnimatedSwitcher(
+      duration: AppMotion.emphasis,
+      child: KeyedSubtree(
+        key: ValueKey(item.id),
+        child: horizontal
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var i = 0; i < 3; i++) ...[if (i > 0) const SizedBox(width: 20), Expanded(child: row(i))],
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  price,
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < 3; i++) ...[row(i), const SizedBox(height: 22)],
+                  const SizedBox(height: 12),
+                  Container(height: 1, color: theme.borderLight),
+                  const SizedBox(height: 16),
+                  price,
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _index(List<(MenuItem, String)> stage, ThemeController theme, {bool compact = false}) {
+    return Row(
+      children: [
+        for (var i = 0; i < stage.length; i++)
+          Expanded(
+            child: Semantics(
+              button: true,
+              selected: i == _active,
+              label: 'Show ${stage[i].$1.name}',
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _select(i),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 44),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: i == stage.length - 1 ? 0 : 16, top: 6),
+                      child: AnimatedOpacity(
+                        duration: AppMotion.standard,
+                        opacity: i == _active ? 1 : 0.45,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(height: 1, color: i == _active ? AppColors.accentOrange : theme.borderLight),
+                            const SizedBox(height: 10),
+                            Text(
+                              compact ? '0${i + 1}' : '0${i + 1}   ${stage[i].$1.name.toUpperCase()}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.scoreboard.copyWith(
+                                fontSize: 11,
+                                letterSpacing: 1.4,
+                                fontWeight: FontWeight.w700,
+                                color: i == _active ? AppColors.accentOrange : theme.primaryText,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    Text(
-                      "REPEAT.",
-                      style: AppTypography.scoreboard.copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.pureWhite,
-                        letterSpacing: 1.0,
-                        height: 1.1,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

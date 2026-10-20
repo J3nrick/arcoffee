@@ -1,6 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import '../../core/constants/app_colors.dart';
 
+/// Add-ons from the printed menu board, asked for at the bar: (name, surcharge).
+const List<(String, String)> barAddOns = [
+  ('Extra Espresso Shot', '+₱30'),
+  ('Substitute Oat Milk', '+₱40'),
+  ('Sweetened Milk', '+₱15'),
+  ('Haw-Haw Cold Foam', '+₱40'),
+  ('Malt Overload', '+₱25'),
+];
+
 /// Supported Menu Categories for Arcoffee.
 enum MenuCategory {
   all('All Items', 'All Drinks & Fuel', CupertinoIcons.sparkles),

@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
+import '../../core/constants/app_constants.dart';
+import '../../core/design/app_colors.dart';
+import '../../core/design/app_typography.dart';
 import '../../core/network/api_client.dart';
 import '../../core/utils/image_precacher.dart';
 import '../../data/repositories/gallery_repository.dart';
@@ -8,314 +12,245 @@ import '../../data/repositories/menu_repository.dart';
 import '../../data/repositories/store_repository.dart';
 import '../../data/services/gallery_service.dart';
 import '../../data/services/menu_service.dart';
-import '../../data/services/order_tray_service.dart';
 import '../../data/services/store_service.dart';
 import '../app_scaffold.dart';
 
-/// Luxury Editorial Splash Screen & Seamless Transition for ARCOFFEE.
+/// "The Lob": Arcoffee's opening sequence.
 ///
-/// Implements a 5-second cinematic brand experience:
-/// - 0.0s - 1.2s: Fluid cinematic entrance (opacity 0 -> 1, scale 0.94 -> 1.0, subtle rise)
-/// - 1.2s - 3.8s: Organic living breath with high-fashion editorial metadata reveal
-/// - 3.8s - 5.0s: Masterful choreographed transition into the Home view:
-///                Logo gently elevates (-30px) and expands (1.0 -> 1.08) while dissolving,
-///                as AppScaffold floats upward and blooms seamlessly on the shared cream canvas.
+/// The logo's swoosh is the flight of a pickleball. A ball is lobbed across
+/// the night court, its flight drawing the arc; it lands in the "A", rings
+/// ripple out from the landing, the mark settles under a court-light glow and
+/// the community lines in. On exit the mark zooms through the camera into the site.
 ///
-/// Also handles instantaneous Court QR-code bypass when ?source=qr or ?order=court or ?court=X is detected.
+/// Court QR scans (?source=qr, ?court=N) get a sub-second version that opens on the Menu.
 class SplashScreen extends StatefulWidget {
   final Widget? homeScreen;
 
-  const SplashScreen({
-    super.key,
-    this.homeScreen,
-  });
+  const SplashScreen({super.key, this.homeScreen});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  late final AnimationController _introController;
-  late final AnimationController _breathController;
-
-  late final Animation<double> _introFade;
-  late final Animation<double> _introScale;
-  late final Animation<Offset> _introSlide;
-
-  late final Animation<double> _breathScale;
-  late final Animation<double> _taglineFade;
-  late final Animation<Offset> _taglineSlide;
-
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+  late final AnimationController _t;
+  late final AnimationController _breath;
   Timer? _navigationTimer;
   bool _isNavigating = false;
-  bool _assetsPrecached = false;
+  bool _started = false;
+  bool _isQrBypass = false;
   int _initialTabIndex = 0;
-  String? _preselectedCourt;
 
-  // Exact sampled cream background from the brand logo asset to ensure zero borders
-  static const Color creamBackground = Color(0xFFFBF7EB);
-  static const String logoAsset =
-      'assets/547188584_122096374029023682_3566562690668451689_n_2.jpg';
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_assetsPrecached) {
-      _assetsPrecached = true;
-      precacheImage(const AssetImage(logoAsset), context);
-      ImagePrecacher.precacheCoreAssets(context);
-    }
-  }
+  static const String _logoAsset = 'assets/images/logo_orange.png';
+  static const Color _night = Color(0xFF07111D);
+  static const List<String> _community = ['COFFEE', 'COMMUNITY', 'SPORT', 'NIGHTLIFE'];
 
   @override
   void initState() {
     super.initState();
-
-    // Inspect URI parameters for court-side QR code bypass
     final uri = Uri.base;
     final source = uri.queryParameters['source']?.toLowerCase();
+    // Printed court QR codes may carry ?order=court or ?court=N; they open straight on the Menu.
     final order = uri.queryParameters['order']?.toLowerCase();
     final court = uri.queryParameters['court'];
+    _isQrBypass = source == 'qr' || order == 'court' || (court != null && court.isNotEmpty);
+    _initialTabIndex = _isQrBypass ? 1 : 0;
 
-    final bool isQrBypass = source == 'qr' || order == 'court' || (court != null && court.isNotEmpty);
-    if (court != null && court.isNotEmpty) {
-      OrderTrayService.instance.setCourtNumber(court);
+    _t = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: _isQrBypass ? 900 : 3600),
+    );
+    _breath = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    precacheImage(const AssetImage(_logoAsset), context);
+    ImagePrecacher.precacheCoreAssets(context);
+
+    if (MediaQuery.of(context).disableAnimations) {
+      _t.value = 1;
+      _navigationTimer = Timer(const Duration(milliseconds: 1200), _navigateToHome);
+      return;
     }
-
-    _initialTabIndex = isQrBypass ? 1 : 0;
-    _preselectedCourt = court;
-
-    // 1. Phase 1: Entrance animation
-    _introController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: isQrBypass ? 500 : 1200),
-    );
-
-    final CurvedAnimation introDecel = CurvedAnimation(
-      parent: _introController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _introFade = Tween<double>(begin: 0.0, end: 1.0).animate(introDecel);
-
-    _introScale = Tween<double>(begin: 0.94, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _introController,
-        curve: Curves.easeOutQuart,
-      ),
-    );
-
-    _introSlide = Tween<Offset>(
-      begin: const Offset(0.0, 0.04),
-      end: Offset.zero,
-    ).animate(introDecel);
-
-    // 2. Phase 2: Living breath & editorial metadata reveal
-    _breathController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: isQrBypass ? 500 : 2600),
-    );
-
-    _breathScale = Tween<double>(begin: 1.0, end: 1.028).animate(
-      CurvedAnimation(
-        parent: _breathController,
-        curve: Curves.easeInOutSine,
-      ),
-    );
-
-    _taglineFade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _breathController,
-        curve: const Interval(0.20, 0.65, curve: Curves.easeOut),
-      ),
-    );
-
-    _taglineSlide = Tween<Offset>(
-      begin: const Offset(0.0, 0.15),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _breathController,
-        curve: const Interval(0.20, 0.70, curve: Curves.easeOutCubic),
-      ),
-    );
-
-    // Start intro immediately; chain living breath right after
-    _introController.forward().then((_) {
+    _t.forward().whenComplete(() {
       if (!mounted) return;
-      _breathController.forward();
+      _breath.repeat(reverse: true);
+      _navigationTimer = Timer(Duration(milliseconds: _isQrBypass ? 150 : 700), _navigateToHome);
     });
-
-    // 3. Phase 3: Trigger transition to target view
-    // Normal visit: 3800ms hold + transition = ~5s cinematic sequence
-    // QR code scan: snappy 700ms quick-flash right into Menu
-    final splashHoldMs = isQrBypass ? 700 : 3800;
-    _navigationTimer = Timer(Duration(milliseconds: splashHoldMs), _navigateToHome);
   }
 
   void _navigateToHome() {
     if (_isNavigating || !mounted) return;
     _isNavigating = true;
-
-    final targetScreen = widget.homeScreen ??
-        _createDefaultHomeScreen(
-          initialTabIndex: _initialTabIndex,
-          preselectedCourt: _preselectedCourt,
-        );
+    final target = widget.homeScreen ??
+        _createDefaultHomeScreen(initialTabIndex: _initialTabIndex);
+    final reduced = MediaQuery.of(context).disableAnimations;
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        transitionDuration: Duration(milliseconds: _initialTabIndex == 1 ? 600 : 1200),
-        pageBuilder: (context, animation, secondaryAnimation) => targetScreen,
+        transitionDuration: Duration(milliseconds: reduced ? 300 : (_isQrBypass ? 600 : 1300)),
+        pageBuilder: (context, animation, secondaryAnimation) => target,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          // Luxury Apple Keynote-style transition:
-          // Incoming screen floats upward and dissolves in smoothly
-          final curved = CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutQuart,
-          );
-
-          final slideAnim = Tween<Offset>(
-            begin: const Offset(0.0, 0.035),
-            end: Offset.zero,
-          ).animate(curved);
-
-          final scaleAnim = Tween<double>(
-            begin: 0.985,
-            end: 1.0,
-          ).animate(curved);
-
-          final fadeAnim = CurvedAnimation(
-            parent: animation,
-            curve: const Interval(0.10, 1.0, curve: Curves.easeOutCubic),
-          );
-
-          return FadeTransition(
-            opacity: fadeAnim,
-            child: SlideTransition(
-              position: slideAnim,
-              child: ScaleTransition(
-                scale: scaleAnim,
-                child: child,
-              ),
-            ),
-          );
+          // The site arrives once the zooming mark has filled the frame.
+          final fade = CurvedAnimation(parent: animation, curve: const Interval(0.42, 1.0, curve: Curves.easeOutCubic));
+          final scale = Tween<double>(begin: 1.06, end: 1.0)
+              .animate(CurvedAnimation(parent: animation, curve: const Interval(0.42, 1.0, curve: Curves.easeOutQuart)));
+          return FadeTransition(opacity: fade, child: ScaleTransition(scale: scale, child: child));
         },
       ),
     );
   }
 
-  Widget _createDefaultHomeScreen({int initialTabIndex = 0, String? preselectedCourt}) {
+  Widget _createDefaultHomeScreen({int initialTabIndex = 0}) {
     final apiClient = ApiClient();
-    final menuService = MenuService(apiClient: apiClient);
-    final storeService = StoreService(apiClient: apiClient);
-    final galleryService = GalleryService(apiClient: apiClient);
-
     return AppScaffold(
-      menuRepository: AppMenuRepository(menuService: menuService),
-      storeRepository: AppStoreRepository(storeService: storeService),
-      galleryRepository: AppGalleryRepository(galleryService: galleryService),
+      menuRepository: AppMenuRepository(menuService: MenuService(apiClient: apiClient)),
+      storeRepository: AppStoreRepository(storeService: StoreService(apiClient: apiClient)),
+      galleryRepository: AppGalleryRepository(galleryService: GalleryService(apiClient: apiClient)),
       initialTabIndex: initialTabIndex,
-      preselectedCourt: preselectedCourt,
     );
   }
 
   @override
   void dispose() {
     _navigationTimer?.cancel();
-    _introController.dispose();
-    _breathController.dispose();
+    _t.dispose();
+    _breath.dispose();
     super.dispose();
   }
 
+  /// Progress of [_t] within [a]..[b], eased.
+  double _seg(double a, double b, [Curve curve = Curves.easeOutCubic]) =>
+      curve.transform(((_t.value - a) / (b - a)).clamp(0.0, 1.0));
+
   @override
   Widget build(BuildContext context) {
-    // Check if the route is exiting to coordinate simultaneous outgoing motion
-    final secondaryAnim = ModalRoute.of(context)?.secondaryAnimation;
+    final size = MediaQuery.sizeOf(context);
+    final logoW = math.min(size.width * 0.62, 420.0);
+    final logoH = logoW / 2.2875;
+    final exit = ModalRoute.of(context)?.secondaryAnimation ?? kAlwaysDismissedAnimation;
 
-    Widget body = Center(
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_introController, _breathController]),
-        builder: (context, _) {
-          final double combinedScale = _introScale.value * _breathScale.value;
+    return Scaffold(
+      backgroundColor: _night,
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _navigateToHome,
+        child: Semantics(
+          label: 'Arcoffee. ${AppConstants.slogan} Tap to enter.',
+          child: AnimatedBuilder(
+            animation: Listenable.merge([_t, _breath, exit]),
+            builder: (context, _) {
+              final out = Curves.easeInCubic.transform(exit.value);
+              final chromeFade = 1 - (exit.value / 0.3).clamp(0.0, 1.0);
+              final flight = _seg(0.10, 0.50, Curves.easeInOutSine);
+              final landed = _seg(0.46, 0.62);
+              final breath = Curves.easeInOutSine.transform(_breath.value);
+              // One rect places both the painted flight and the logo image, so the trail hands off exactly.
+              final logoRect = Rect.fromCenter(
+                center: Offset(size.width / 2, size.height * 0.42),
+                width: logoW,
+                height: logoH,
+              );
 
-          return FadeTransition(
-            opacity: _introFade,
-            child: SlideTransition(
-              position: _introSlide,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              return Stack(
+                fit: StackFit.expand,
                 children: [
-                  // 1. Iconic Arcoffee Brand Mark
-                  Transform.scale(
-                    scale: combinedScale,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 420,
-                        maxHeight: 250,
-                      ),
-                      child: Image.asset(
-                        logoAsset,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
+                  // Night court light: a soft pool that blooms on landing.
+                  Opacity(
+                    opacity: 1 - (exit.value - 0.5).clamp(0.0, 0.5) * 2,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          center: const Alignment(0, -0.12),
+                          radius: 0.9,
+                          colors: [
+                            Color.lerp(const Color(0xFF10283E), AppColors.accentOrange, 0.10 * landed + 0.04 * breath)!,
+                            _night,
+                          ],
+                        ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 28),
+                  // Court lines, ripples, ball and flight trail.
+                  Opacity(
+                    opacity: chromeFade,
+                    child: CustomPaint(
+                      painter: _LobPainter(
+                        logoRect: logoRect,
+                        lines: _seg(0.0, 0.22),
+                        flight: flight,
+                        trailFade: 1 - landed,
+                        ripples: _t.value,
+                        breath: breath,
+                      ),
+                    ),
+                  ),
 
-                  // 2. High-Fashion Editorial Metadata Colophon
-                  FadeTransition(
-                    opacity: _taglineFade,
-                    child: SlideTransition(
-                      position: _taglineSlide,
+                  // Mark: settles on landing, zooms through the camera on exit.
+                  Positioned.fromRect(
+                    rect: logoRect,
+                    child: Transform.scale(
+                      scale: (0.94 + 0.06 * landed + 0.015 * breath) * (1 + 22 * out),
+                      child: Opacity(
+                        opacity: landed * (1 - (exit.value - 0.7).clamp(0.0, 0.3) / 0.3),
+                        child: Image.asset(_logoAsset, fit: BoxFit.fill, filterQuality: FilterQuality.high),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: logoRect.bottom + logoH * 0.42,
+                    child: Opacity(opacity: chromeFade, child: Center(child: _wordmark(logoW))),
+                  ),
+
+                  // Footer: community words and the loading hairline.
+                  Positioned(
+                    left: 24,
+                    right: 24,
+                    bottom: math.max(32, size.height * 0.07),
+                    child: Opacity(
+                      opacity: chromeFade,
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Hairline court line
-                          Container(
-                            width: 36,
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 18,
+                            runSpacing: 8,
+                            children: [
+                              for (var i = 0; i < _community.length; i++)
+                                Opacity(
+                                  opacity: _seg(0.74 + i * 0.05, 0.88 + i * 0.03),
+                                  child: Text(
+                                    _community[i],
+                                    style: AppTypography.scoreboard.copyWith(
+                                      fontSize: 10.5,
+                                      letterSpacing: 2.6,
+                                      fontWeight: FontWeight.w700,
+                                      color: i == 1 ? AppColors.accentOrange : AppColors.warmCream.withValues(alpha: 0.6),
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          SizedBox(
+                            width: 120,
                             height: 1,
-                            color: const Color(0xFF0B1B2B).withValues(alpha: 0.16),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'ARCOFFEE',
-                            style: TextStyle(
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontFamilyFallback: [
-                                '-apple-system',
-                                'BlinkMacSystemFont',
-                                'SF Pro Display',
-                                'Inter',
-                                'sans-serif',
+                            child: Stack(
+                              children: [
+                                Container(color: AppColors.warmCream.withValues(alpha: 0.12)),
+                                FractionallySizedBox(
+                                  widthFactor: _t.value,
+                                  child: Container(color: AppColors.accentOrange),
+                                ),
                               ],
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 4.8,
-                              color: Color(0xFF0B1B2B),
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'COURT-SIDE COFFEE CULTURE  •  THE PICKLEGROUND PH',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'JetBrains Mono',
-                              fontFamilyFallback: const [
-                                'SF Mono',
-                                'Menlo',
-                                'Monaco',
-                                'Consolas',
-                                'monospace',
-                              ],
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 2.2,
-                              color: const Color(0xFFF36622).withValues(alpha: 0.95),
-                              decoration: TextDecoration.none,
                             ),
                           ),
                         ],
@@ -323,50 +258,181 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                 ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-
-    // If route is exiting, orchestrate the splash elements lifting & dissolving
-    if (secondaryAnim != null) {
-      body = AnimatedBuilder(
-        animation: secondaryAnim,
-        builder: (context, child) {
-          final exitCurved = CurvedAnimation(
-            parent: secondaryAnim,
-            curve: Curves.easeInCubic,
-          );
-
-          final exitFade = 1.0 - (exitCurved.value * 1.0);
-          final exitSlideY = -0.06 * exitCurved.value;
-          final exitScale = 1.0 + (exitCurved.value * 0.08);
-
-          return Transform.translate(
-            offset: Offset(0, exitSlideY * 300),
-            child: Transform.scale(
-              scale: exitScale,
-              child: Opacity(
-                opacity: exitFade.clamp(0.0, 1.0),
-                child: child,
-              ),
-            ),
-          );
-        },
-        child: body,
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: creamBackground,
-      // Tap anywhere to instantly trigger the smooth transition to Home if eager
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _navigateToHome,
-        child: body,
+              );
+            },
+          ),
+        ),
       ),
     );
   }
+
+  Widget _wordmark(double logoW) {
+    const word = 'ARCOFFEE';
+    final spread = _seg(0.58, 0.86, Curves.easeOutQuart);
+    final fontSize = (logoW * 0.11).clamp(20.0, 40.0);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var i = 0; i < word.length; i++)
+              Opacity(
+                opacity: _seg(0.58 + i * 0.022, 0.72 + i * 0.022),
+                child: Transform.translate(
+                  offset: Offset(0, 14 * (1 - _seg(0.58 + i * 0.022, 0.76 + i * 0.022))),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: fontSize * (0.12 + 0.3 * (1 - spread))),
+                    child: Text(
+                      word[i],
+                      style: AppTypography.displayXL.copyWith(
+                        fontSize: fontSize,
+                        height: 1,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0,
+                        color: AppColors.warmCream,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Opacity(
+          opacity: _seg(0.70, 0.88),
+          child: Text(
+            AppConstants.slogan,
+            style: AppTypography.bodyLarge.copyWith(
+              fontSize: (fontSize * 0.5).clamp(14.0, 19.0),
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w500,
+              color: AppColors.accentOrange,
+              decoration: TextDecoration.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Paints the night-court scene: baseline, the ball's flight, and landing ripples.
+class _LobPainter extends CustomPainter {
+  final Rect logoRect;
+  final double lines;
+  final double flight;
+  final double trailFade;
+  final double ripples;
+  final double breath;
+
+  _LobPainter({
+    required this.logoRect,
+    required this.lines,
+    required this.flight,
+    required this.trailFade,
+    required this.ripples,
+    required this.breath,
+  });
+
+  // The swoosh in the logo's own 366 x 160 space, as one cubic.
+  Path _flightPath() {
+    Offset p(double x, double y) => Offset(logoRect.left + x / 366 * logoRect.width, logoRect.top + y / 160 * logoRect.height);
+    final a = p(12, 124), b = p(60, 30), c = p(200, 8), d = p(272, 102);
+    return Path()
+      ..moveTo(a.dx, a.dy)
+      ..cubicTo(b.dx, b.dy, c.dx, c.dy, d.dx, d.dy);
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const cream = AppColors.warmCream;
+    const orange = AppColors.accentOrange;
+
+    // Court baseline and service ticks draw outward from the centre.
+    final baseY = logoRect.bottom + logoRect.height * 0.12;
+    final half = size.width * 0.42 * lines;
+    final linePaint = Paint()
+      ..color = cream.withValues(alpha: 0.14)
+      ..strokeWidth = 1;
+    canvas.drawLine(Offset(size.width / 2 - half, baseY), Offset(size.width / 2 + half, baseY), linePaint);
+    for (final dx in [-0.28, 0.28]) {
+      final x = size.width / 2 + size.width * dx * lines;
+      canvas.drawLine(Offset(x, baseY - 8 * lines), Offset(x, baseY + 8 * lines), linePaint);
+    }
+
+    // Landing ripples: three rings from the mark, like a ball hitting still water.
+    final centre = logoRect.center;
+    for (var i = 0; i < 3; i++) {
+      final r = ((ripples - 0.48 - i * 0.07) / 0.45).clamp(0.0, 1.0);
+      if (r <= 0 || r >= 1) continue;
+      final eased = Curves.easeOutCubic.transform(r);
+      canvas.drawCircle(
+        centre,
+        logoRect.width * (0.35 + 0.95 * eased),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.4
+          ..color = orange.withValues(alpha: 0.55 * (1 - r)),
+      );
+    }
+
+    // A steady ring that settles round the mark once it has landed (the video's ring, our court circle).
+    final settle = ((ripples - 0.56) / 0.3).clamp(0.0, 1.0);
+    if (settle > 0) {
+      final ringRect = Rect.fromCircle(center: centre, radius: logoRect.width * (0.62 + 0.01 * breath));
+      canvas.drawArc(
+        ringRect,
+        -math.pi / 2,
+        2 * math.pi * Curves.easeInOutCubic.transform(settle),
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1
+          ..color = cream.withValues(alpha: 0.16),
+      );
+    }
+
+    if (flight <= 0 || trailFade <= 0) return;
+
+    // Flight trail: tapered, thickening toward the landing like the logo's swoosh.
+    final metric = _flightPath().computeMetrics().first;
+    final travelled = metric.length * flight;
+    const segments = 48;
+    for (var s = 0; s < segments; s++) {
+      final t0 = s / segments, t1 = (s + 1) / segments;
+      if (t0 * metric.length > travelled) break;
+      final seg = metric.extractPath(t0 * metric.length, math.min(t1 * metric.length, travelled));
+      canvas.drawPath(
+        seg,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = logoRect.height * (0.03 + 0.11 * t1)
+          ..color = orange.withValues(alpha: trailFade),
+      );
+    }
+
+    // The ball, with a soft court-light glow.
+    final ball = metric.getTangentForOffset(travelled)!.position;
+    final ballR = logoRect.height * 0.055;
+    canvas.drawCircle(
+      ball,
+      ballR * 3,
+      Paint()
+        ..color = orange.withValues(alpha: 0.25 * trailFade)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
+    );
+    canvas.drawCircle(ball, ballR, Paint()..color = cream.withValues(alpha: trailFade));
+  }
+
+  @override
+  bool shouldRepaint(_LobPainter old) =>
+      old.lines != lines ||
+      old.flight != flight ||
+      old.trailFade != trailFade ||
+      old.ripples != ripples ||
+      old.breath != breath ||
+      old.logoRect != logoRect;
 }

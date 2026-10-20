@@ -8,7 +8,6 @@ import 'data/services/menu_service.dart';
 import 'data/services/store_service.dart';
 import 'features/app_scaffold.dart';
 import 'features/splash/splash_screen.dart';
-import 'shared/widgets/custom_cursor.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_controller.dart';
 
@@ -72,11 +71,6 @@ class _ArcoffeeAppState extends State<ArcoffeeApp> {
             theme: _themeController.isMidnightCourt
                 ? AppTheme.darkTheme
                 : AppTheme.lightTheme,
-            builder: (context, child) {
-              return CustomCursorWrapper(
-                child: child ?? const SizedBox.shrink(),
-              );
-            },
             home: SplashScreen(
               homeScreen: AppScaffold(
                 menuRepository: _menuRepository,

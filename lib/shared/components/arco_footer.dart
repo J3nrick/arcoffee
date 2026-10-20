@@ -13,7 +13,10 @@ import 'arco_logo.dart';
 class ArcoFooter extends StatelessWidget {
   final ValueChanged<int>? onNavigate;
 
-  const ArcoFooter({super.key, this.onNavigate});
+  /// Hidden on Home, which closes with its own Join the Club section.
+  final bool showJoin;
+
+  const ArcoFooter({super.key, this.onNavigate, this.showJoin = true});
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +87,10 @@ class ArcoFooter extends StatelessWidget {
             const SizedBox(height: 36),
 
             // "Join the Club" Community Subscription
-            const _JoinTheClubSection(),
-            const SizedBox(height: 40),
+            if (showJoin) ...[
+              const ArcoJoinForm(),
+              const SizedBox(height: 40),
+            ],
 
             // Navigation Links Row
             Wrap(
@@ -199,14 +204,16 @@ class ArcoFooter extends StatelessWidget {
   }
 }
 
-class _JoinTheClubSection extends StatefulWidget {
-  const _JoinTheClubSection();
+/// "Join the Club" email signup, shared by the footer and Home's closing section.
+class ArcoJoinForm extends StatefulWidget {
+  final bool showHeading;
+  const ArcoJoinForm({super.key, this.showHeading = true});
 
   @override
-  State<_JoinTheClubSection> createState() => _JoinTheClubSectionState();
+  State<ArcoJoinForm> createState() => _ArcoJoinFormState();
 }
 
-class _JoinTheClubSectionState extends State<_JoinTheClubSection> {
+class _ArcoJoinFormState extends State<ArcoJoinForm> {
   final TextEditingController _emailController = TextEditingController();
   bool _isSubscribed = false;
 
@@ -263,6 +270,7 @@ class _JoinTheClubSectionState extends State<_JoinTheClubSection> {
       constraints: const BoxConstraints(maxWidth: 500),
       child: Column(
         children: [
+          if (widget.showHeading) ...[
           Text(
             "JOIN THE CLUB",
             style: AppTypography.scoreboard.copyWith(
@@ -282,6 +290,7 @@ class _JoinTheClubSectionState extends State<_JoinTheClubSection> {
             ),
           ),
           const SizedBox(height: 18),
+          ],
           if (isMobile)
             Column(
               children: [

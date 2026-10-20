@@ -10,6 +10,7 @@ class LocalCacheService {
   static const String _keyGallery = 'arcoffee_cache_gallery';
   static const String _keyStore = 'arcoffee_cache_store';
   static const String _keyLikes = 'arcoffee_cache_likes';
+  static const String _keyCourtCard = 'arcoffee_court_card';
 
   SharedPreferences? _prefs;
 
@@ -90,4 +91,13 @@ class LocalCacheService {
     final list = _prefs?.getStringList(_keyLikes);
     return list != null ? list.toSet() : {};
   }
+
+  /// Save the drink ids on the visitor's Court Card, in the order they were added
+  Future<void> saveCourtCardIds(List<String> ids) async {
+    await init();
+    await _prefs?.setStringList(_keyCourtCard, ids);
+  }
+
+  /// Load the drink ids on the visitor's Court Card
+  List<String> getCourtCardIds() => _prefs?.getStringList(_keyCourtCard) ?? const [];
 }

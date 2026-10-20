@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import '../../../core/design/app_breakpoints.dart';
 import '../../../core/design/app_colors.dart';
 import '../../../core/design/app_typography.dart';
-import '../../../core/utils/image_precacher.dart';
 import '../../../data/repositories/gallery_repository.dart';
-import '../../../shared/components/arco_court_line.dart';
+import '../../../shared/components/arco_in_view.dart';
+import '../../../shared/components/arco_lightbox.dart';
+import '../../../shared/components/arco_page_cover.dart';
 import '../../../theme/theme_controller.dart';
 
 /// "The Arcoffee Wall" Editorial Collage Section.
@@ -12,7 +13,10 @@ import '../../../theme/theme_controller.dart';
 class GalleryView extends StatefulWidget {
   final GalleryRepository repository;
 
-  const GalleryView({super.key, required this.repository});
+  /// True when shown as its own page (adds the cover, drops the section header).
+  final bool standalone;
+
+  const GalleryView({super.key, required this.repository, this.standalone = false});
 
   @override
   State<GalleryView> createState() => _GalleryViewState();
@@ -79,6 +83,13 @@ class _GalleryViewState extends State<GalleryView> {
     },
   ];
 
+  // Asymmetric collage rhythm per row: (flex, photo height, drop from row top).
+  static const List<List<(int, double, double)>> _collageRows = [
+    [(4, 420, 0), (3, 340, 72), (4, 380, 24)],
+    [(3, 360, 32), (4, 440, 0), (4, 360, 56)],
+    [(4, 380, 0), (4, 420, 40), (3, 340, 12)],
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -93,413 +104,266 @@ class _GalleryViewState extends State<GalleryView> {
     });
   }
 
-  void _openImageLightbox(BuildContext context, Map<String, String> photo) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (ctx) {
-        return Container(
-          color: AppColors.deepBlue.withValues(alpha: 0.96),
-          child: SafeArea(
-            child: Stack(
-              children: [
-                Center(
-                  child: InteractiveViewer(
-                    maxScale: 3.5,
-                    child: photo['asset'] != null
-                        ? Image.asset(photo['asset']!, fit: BoxFit.contain)
-                        : Image.network(photo['url'] ?? '', fit: BoxFit.contain),
-                  ),
-                ),
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: CupertinoButton(
-                    color: AppColors.accentOrange,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    child: const Text(
-                      "CLOSE ✕",
-                      style: TextStyle(
-                        fontFamily: AppTypography.displayFont,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.pureWhite,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 24,
-                  left: 24,
-                  right: 24,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.deepBlue.withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: AppColors.accentOrange.withValues(alpha: 0.4),
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          photo['caption']!,
-                          style: const TextStyle(
-                            fontFamily: AppTypography.scoreboardFont,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.0,
-                            color: AppColors.accentOrange,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          photo['story']!,
-                          style: const TextStyle(
-                            fontFamily: AppTypography.bodyFont,
-                            fontSize: 13,
-                            color: AppColors.pureWhite,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+  void _openPhoto(int i) {
+    final photo = _editorialPhotos[i];
+    showArcoLightbox(
+      context,
+      asset: photo['asset']!,
+      title: '${(i + 1).toString().padLeft(2, '0')}  ·  ${photo['title']}  ·  ${photo['caption']}',
+      story: photo['story']!,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = ThemeScope.of(context);
-    final isDark = theme.isMidnightCourt;
     final isDesktop = AppBreakpoints.isDesktop(context);
-    final horizontalPad = AppBreakpoints.horizontalPadding(context);
+    final pad = AppBreakpoints.horizontalPadding(context);
 
-    if (_isLoading) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(48.0),
-          child: CupertinoActivityIndicator(radius: 16),
-        ),
-      );
-    }
-
-    return Container(
+    final body = Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPad,
-        vertical: isDesktop ? 64.0 : 36.0,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: pad, vertical: isDesktop ? 112 : 56),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: AppBreakpoints.desktopMax),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Section Header & Brand Monospaced Label
-            Text(
-              "AR / 003   |   THE ARCOFFEE WALL (EDITORIAL COLLAGE)",
-              style: AppTypography.scoreboard.copyWith(
-                fontSize: 12,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
+        child: _isLoading
+            ? const Padding(
+                padding: EdgeInsets.all(48),
+                child: Center(child: CupertinoActivityIndicator(radius: 14)),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!widget.standalone) ...[
+                    _buildSectionHeader(theme, isDesktop),
+                    SizedBox(height: isDesktop ? 80 : 40),
+                  ],
+                  if (isDesktop) _buildDesktopCollage(theme) else _buildMobileCollage(theme),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            ArcoCourtLine(
-              width: double.infinity,
-              height: 1.2,
-              color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
-            ),
-            const SizedBox(height: 18),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Text(
-                    "Good Coffee. Good People. Good Games.",
-                    style: AppTypography.display.copyWith(
-                      color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-                      fontSize: isDesktop ? 36 : 26,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                const Text(
-                  "[ EXPAND FULLSCREEN ]",
-                  style: TextStyle(
-                    fontFamily: AppTypography.monoFont,
-                    fontFamilyFallback: AppTypography.monoFontFallback,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.0,
-                    color: AppColors.accentOrange,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-
-            // Editorial Asymmetric Photo Collage (3 Dynamic Rows)
-            if (isDesktop)
-              _buildDesktopEditorialCollage(isDark)
-            else
-              _buildMobileCollage(isDark),
-          ],
-        ),
       ),
     );
-  }
 
-  /// Desktop Asymmetrical Collage across 3 dynamic rows
-  Widget _buildDesktopEditorialCollage(bool isDark) {
+    if (!widget.standalone) return body;
     return Column(
       children: [
-        // Row 1
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 4,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[0],
-                isDark: isDark,
-                height: 380,
-                topOffset: 0,
-              ),
-            ),
-            const SizedBox(width: 28),
-            Expanded(
-              flex: 3,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[1],
-                isDark: isDark,
-                height: 320,
-                topOffset: 48,
-              ),
-            ),
-            const SizedBox(width: 28),
-            Expanded(
-              flex: 4,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[2],
-                isDark: isDark,
-                height: 360,
-                topOffset: 20,
-              ),
-            ),
-          ],
+        const ArcoPageCover(
+          index: 'AR / 003',
+          kicker: 'THE ARCOFFEE WALL  ·  COMMUNITY  ·  SHOT ON COURT',
+          title: 'GOOD\nPEOPLE.',
+          lede: 'Good coffee, good people, good games. Nine plates from the bench, the bar and the baseline at The Pickleground PH.',
+          imageAsset: 'assets/images/community_milo_jersey.jpg',
+          caption: 'PLATE — POST-MATCH DEBRIEF, COURT 2',
         ),
-        const SizedBox(height: 48),
-
-        // Row 2
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[3],
-                isDark: isDark,
-                height: 340,
-                topOffset: 24,
-              ),
-            ),
-            const SizedBox(width: 28),
-            Expanded(
-              flex: 4,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[4],
-                isDark: isDark,
-                height: 380,
-                topOffset: 0,
-              ),
-            ),
-            const SizedBox(width: 28),
-            Expanded(
-              flex: 4,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[5],
-                isDark: isDark,
-                height: 350,
-                topOffset: 40,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 48),
-
-        // Row 3
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 4,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[6],
-                isDark: isDark,
-                height: 350,
-                topOffset: 0,
-              ),
-            ),
-            const SizedBox(width: 28),
-            Expanded(
-              flex: 4,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[7],
-                isDark: isDark,
-                height: 380,
-                topOffset: 30,
-              ),
-            ),
-            const SizedBox(width: 28),
-            Expanded(
-              flex: 3,
-              child: _buildCollageTile(
-                photo: _editorialPhotos[8],
-                isDark: isDark,
-                height: 330,
-                topOffset: 10,
-              ),
-            ),
-          ],
-        ),
+        body,
       ],
     );
   }
 
-  /// Mobile Stacked Collage
-  Widget _buildMobileCollage(bool isDark) {
-    return Column(
-      children: _editorialPhotos.map((photo) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 32.0),
-          child: _buildCollageTile(
-            photo: photo,
-            isDark: isDark,
-            height: 260,
-            topOffset: 0,
+  Widget _buildSectionHeader(ThemeController theme, bool isDesktop) {
+    final title = Text(
+      'Good coffee.\nGood people.\nGood games.',
+      style: AppTypography.displayXL.copyWith(
+        fontSize: isDesktop ? 76 : 44,
+        height: 0.94,
+        letterSpacing: isDesktop ? -2.6 : -1.4,
+        fontWeight: FontWeight.w900,
+        color: theme.primaryText,
+      ),
+    );
+    final aside = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Shot on court, at the bar and on the bench. Tap any plate to see it full size.',
+          style: AppTypography.body.copyWith(fontSize: 15, height: 1.55, color: theme.secondaryText),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          '${_editorialPhotos.length.toString().padLeft(2, '0')} PLATES  ·  KAWIT, CAVITE',
+          style: AppTypography.scoreboard.copyWith(
+            fontSize: 11,
+            letterSpacing: 1.8,
+            fontWeight: FontWeight.w700,
+            color: AppColors.accentOrange,
           ),
-        );
-      }).toList(),
+        ),
+      ],
+    );
+    return ArcoInView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'AR / 003   ·   THE ARCOFFEE WALL',
+            style: AppTypography.scoreboard.copyWith(
+              fontSize: 11,
+              letterSpacing: 1.8,
+              fontWeight: FontWeight.w700,
+              color: AppColors.accentOrange,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(height: 1, color: theme.borderLight),
+          const SizedBox(height: 32),
+          if (isDesktop)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(flex: 7, child: title),
+                const SizedBox(width: 48),
+                Expanded(flex: 3, child: aside),
+              ],
+            )
+          else ...[
+            title,
+            const SizedBox(height: 20),
+            aside,
+          ],
+        ],
+      ),
     );
   }
 
-  /// Individual Editorial Photo Tile with Monospaced Metadata & Lightbox Tap
-  Widget _buildCollageTile({
-    required Map<String, String> photo,
-    required bool isDark,
-    required double height,
-    required double topOffset,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(top: topOffset),
+  Widget _buildDesktopCollage(ThemeController theme) {
+    // Rows are 3 wide, so plate index = row * 3 + column.
+    return Column(
+      children: [
+        for (var r = 0; r < _collageRows.length; r++) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var c = 0; c < 3; c++) ...[
+                if (c > 0) const SizedBox(width: 32),
+                Expanded(
+                  flex: _collageRows[r][c].$1,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: _collageRows[r][c].$3),
+                    child: ArcoInView(
+                      delay: Duration(milliseconds: 110 * c),
+                      child: _CollageTile(
+                        index: r * 3 + c,
+                        photo: _editorialPhotos[r * 3 + c],
+                        height: _collageRows[r][c].$2,
+                        onTap: _openPhoto,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 72),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildMobileCollage(ThemeController theme) {
+    return Column(
+      children: [
+        for (var i = 0; i < _editorialPhotos.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 48),
+            child: ArcoInView(
+              child: _CollageTile(index: i, photo: _editorialPhotos[i], height: i.isEven ? 420 : 300, onTap: _openPhoto),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// One plate on the wall: photograph, number, title and story. No frame, no badges.
+class _CollageTile extends StatefulWidget {
+  final int index;
+  final Map<String, String> photo;
+  final double height;
+  final ValueChanged<int> onTap;
+
+  const _CollageTile({required this.index, required this.photo, required this.height, required this.onTap});
+
+  @override
+  State<_CollageTile> createState() => _CollageTileState();
+}
+
+class _CollageTileState extends State<_CollageTile> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeScope.of(context);
+    final photo = widget.photo;
+    return Semantics(
+      button: true,
+      label: 'Open photograph: ${photo['title']}',
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hover = true),
+        onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
-          onTap: () => _openImageLightbox(context, photo),
+          behavior: HitTestBehavior.opaque,
+          onTap: () => widget.onTap(widget.index),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Photography Box with Depth & Hover Lift
-              Container(
-                height: height,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.12),
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.deepBlue.withValues(alpha: isDark ? 0.35 : 0.08),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      photo['asset'] != null
-                          ? Image.asset(
-                              photo['asset']!,
-                              fit: BoxFit.cover,
-                            )
-                          : ArcoffeeNetworkImage(
-                              imageUrl: photo['url'] ?? '',
-                              fit: BoxFit.cover,
-                              borderRadius: 16,
-                            ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: AppColors.deepBlue.withValues(alpha: 0.75),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            CupertinoIcons.viewfinder,
-                            size: 14,
-                            color: AppColors.pureWhite,
-                          ),
-                        ),
-                      ),
-                    ],
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: SizedBox(
+                  height: widget.height,
+                  width: double.infinity,
+                  child: AnimatedScale(
+                    scale: _hover ? 1.05 : 1.0,
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.easeOutCubic,
+                    child: Image.asset(photo['asset']!, fit: BoxFit.cover),
                   ),
                 ),
               ),
-              const SizedBox(height: 14),
-
-              // Monospaced Timestamp / Tag
+              const SizedBox(height: 16),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    photo['caption']!,
+                    (widget.index + 1).toString().padLeft(2, '0'),
                     style: AppTypography.scoreboard.copyWith(
                       fontSize: 11,
+                      letterSpacing: 1.6,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
                       color: AppColors.accentOrange,
                     ),
                   ),
-                  Text(
-                    photo['title']!,
-                    style: AppTypography.receipt.copyWith(
-                      fontSize: 10,
-                      letterSpacing: 0.8,
-                      color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay,
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          photo['title']!,
+                          style: AppTypography.headingSmall.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.4,
+                            color: theme.primaryText,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          photo['caption']!,
+                          style: AppTypography.scoreboard.copyWith(
+                            fontSize: 10.5,
+                            letterSpacing: 1.2,
+                            color: theme.tertiaryText,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          photo['story']!,
+                          style: AppTypography.bodySmall.copyWith(height: 1.5, color: theme.secondaryText),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 6),
-
-              // Story Text
-              Text(
-                photo['story']!,
-                style: AppTypography.bodySmall.copyWith(
-                  color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
-                  height: 1.4,
-                ),
               ),
             ],
           ),

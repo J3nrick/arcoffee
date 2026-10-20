@@ -3,21 +3,25 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/design/app_breakpoints.dart';
 import '../../../core/design/app_colors.dart';
+import '../../../core/design/app_motion.dart';
 import '../../../core/design/app_typography.dart';
 import '../../../data/models/store_info.dart';
 import '../../../data/repositories/store_repository.dart';
 import '../../../shared/components/arco_button.dart';
-import '../../../shared/components/arco_court_line.dart';
-import '../../../shared/components/arco_logo.dart';
+import '../../../shared/components/arco_in_view.dart';
+import '../../../shared/components/arco_lightbox.dart';
+import '../../../shared/components/arco_page_cover.dart';
+import '../../../shared/components/arco_text_link.dart';
 import '../../../theme/theme_controller.dart';
 
-/// Editorial Location & Operating Hours Section for Arcoffee.
-/// Implements the exact blueprint: Left side narrative & 24H hours,
-/// Right side stylized court location photograph and Waze/Maps CTA.
+/// Location & Hours: scoreboard-style schedule, live status, venue photograph and directions.
 class LocationView extends StatefulWidget {
   final StoreRepository repository;
 
-  const LocationView({super.key, required this.repository});
+  /// True when shown as its own page (adds the cover).
+  final bool standalone;
+
+  const LocationView({super.key, required this.repository, this.standalone = false});
 
   @override
   State<LocationView> createState() => _LocationViewState();
@@ -29,6 +33,9 @@ class _LocationViewState extends State<LocationView> {
   bool _isLoading = true;
   bool _copiedAddress = false;
 
+  static const String _address = "The Pickleground PH, Centennial Road, Kawit, Cavite";
+  static const String _courtLocationAsset = 'assets/images/court_arena_drink.jpg';
+
   Future<void> _openDirections() async {
     final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=14.4445,120.9038');
     if (await canLaunchUrl(uri)) {
@@ -37,8 +44,7 @@ class _LocationViewState extends State<LocationView> {
   }
 
   Future<void> _copyAddress() async {
-    const address = "The Pickleground PH, Centennial Road, Kawit, Cavite";
-    await Clipboard.setData(const ClipboardData(text: address));
+    await Clipboard.setData(const ClipboardData(text: _address));
     if (!mounted) return;
     setState(() => _copiedAddress = true);
     Future.delayed(const Duration(seconds: 3), () {
@@ -46,110 +52,12 @@ class _LocationViewState extends State<LocationView> {
     });
   }
 
-  // Real location photo: The Pickleground PH indoor arena overlooking courts
-  static const String _courtLocationAsset =
-      'assets/images/court_arena_drink.jpg';
-
-  void _openLocationLightbox(BuildContext context) {
-    showCupertinoModalPopup<void>(
-      context: context,
-      barrierColor: const Color(0xE607111D),
-      builder: (ctx) {
-        return Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 880, maxHeight: 720),
-            child: Container(
-              margin: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F1B28),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.accentOrange.withValues(alpha: 0.4),
-                  width: 1.2,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    InteractiveViewer(
-                      minScale: 1.0,
-                      maxScale: 3.5,
-                      child: Center(
-                        child: Image.asset(
-                          _courtLocationAsset,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(36, 36),
-                        borderRadius: BorderRadius.circular(18),
-                        color: AppColors.deepBlue.withValues(alpha: 0.8),
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Icon(
-                          CupertinoIcons.xmark,
-                          color: AppColors.pureWhite,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 20,
-                      left: 20,
-                      right: 20,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.deepBlue.withValues(alpha: 0.88),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.accentOrange.withValues(alpha: 0.4),
-                            width: 1.0,
-                          ),
-                        ),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "THE PICKLEGROUND PH • KAWIT ARENA",
-                              style: TextStyle(
-                                fontFamily: AppTypography.scoreboardFont,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.0,
-                                color: AppColors.accentOrange,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              "Arcoffee courtside specialty bar operating alongside tournament-standard pickleball courts in Kawit, Cavite.",
-                              style: TextStyle(
-                                fontFamily: AppTypography.bodyFont,
-                                fontSize: 13,
-                                color: AppColors.pureWhite,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  void _openLocationLightbox() => showArcoLightbox(
+        context,
+        asset: _courtLocationAsset,
+        title: 'THE PICKLEGROUND PH  ·  KAWIT ARENA',
+        story: 'Arcoffee courtside specialty bar operating alongside tournament-standard pickleball courts in Kawit, Cavite.',
+      );
 
   @override
   void initState() {
@@ -170,346 +78,277 @@ class _LocationViewState extends State<LocationView> {
 
   @override
   Widget build(BuildContext context) {
-    final horizontalPad = AppBreakpoints.horizontalPadding(context);
+    final pad = AppBreakpoints.horizontalPadding(context);
     final isDesktop = AppBreakpoints.isDesktop(context);
     final theme = ThemeScope.of(context);
-    final isDark = theme.isMidnightCourt;
 
-    if (_isLoading) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(48.0),
-          child: CupertinoActivityIndicator(radius: 16),
-        ),
-      );
-    }
-
-    final store = _storeInfo!;
-
-    return Container(
+    final body = Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPad,
-        vertical: isDesktop ? 64.0 : 36.0,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: pad, vertical: isDesktop ? 112 : 56),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: AppBreakpoints.desktopMax),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Section Header & Brand Monospaced Label
-            Text(
-              "AR / 004   |   FIND US AT THE COURT",
-              style: AppTypography.scoreboard.copyWith(
-                fontSize: 12,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.accentOrange : AppColors.deepBlue,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ArcoCourtLine(
-              width: double.infinity,
-              height: 1.2,
-              color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
-            ),
-            const SizedBox(height: 36),
-
-            // Editorial Asymmetric Layout
-            if (isDesktop)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left Side: Venue Details, Operating Hours, Status & CTA (50% Width)
-                  Expanded(
-                    flex: 50,
-                    child: _buildLocationStory(store, isDark),
-                  ),
-                  const SizedBox(width: 56),
-
-                  // Right Side: Location Photograph & Court Coordinates (50% Width)
-                  Expanded(
-                    flex: 50,
-                    child: _buildLocationPhotoCard(isDark),
-                  ),
-                ],
+        child: _isLoading
+            ? const Padding(
+                padding: EdgeInsets.all(48),
+                child: Center(child: CupertinoActivityIndicator(radius: 14)),
               )
-            else
-              Column(
+            : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLocationStory(store, isDark),
-                  const SizedBox(height: 36),
-                  _buildLocationPhotoCard(isDark, height: 260),
+                  ArcoInView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'AR / 004   ·   FIND US AT THE COURT',
+                          style: AppTypography.scoreboard.copyWith(
+                            fontSize: 11,
+                            letterSpacing: 1.8,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.accentOrange,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Container(height: 1, color: theme.borderLight),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: isDesktop ? 56 : 36),
+                  if (isDesktop)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 6, child: ArcoInView(child: _buildStory(_storeInfo!, theme))),
+                        const SizedBox(width: 80),
+                        Expanded(
+                          flex: 5,
+                          child: ArcoInView(
+                            delay: const Duration(milliseconds: 140),
+                            child: _buildPhoto(theme, height: 560),
+                          ),
+                        ),
+                      ],
+                    )
+                  else ...[
+                    ArcoInView(child: _buildStory(_storeInfo!, theme)),
+                    const SizedBox(height: 48),
+                    ArcoInView(child: _buildPhoto(theme, height: 420)),
+                  ],
                 ],
               ),
-          ],
-        ),
       ),
     );
-  }
 
-  /// Left Side Narrative: Venue, Hours, Open Status, and Directions Action
-  Widget _buildLocationStory(StoreInfo store, bool isDark) {
+    if (!widget.standalone) return body;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Venue Title
-        Text(
-          store.venue.toUpperCase(),
-          style: AppTypography.headingXL.copyWith(
-            fontSize: 32,
-            letterSpacing: -1.0,
-            fontWeight: FontWeight.w900,
-            color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-          ),
-        ),
-        const SizedBox(height: 8),
-
-        // Address
-        Text(
-          "${store.address}, ${store.province}",
-          style: AppTypography.bodyLarge.copyWith(
-            fontSize: 16,
-            color: isDark ? AppColors.textSecondaryNight : AppColors.textSecondaryDay,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          "Beside major Kawit/Noveleta transit corridors with direct Cavitex access.",
-          style: AppTypography.receipt.copyWith(
-            fontSize: 12,
-            color: isDark ? AppColors.textTertiaryNight : AppColors.textTertiaryDay,
-          ),
-        ),
-        const SizedBox(height: 28),
-
-        // Court Hairline Separator
-        ArcoCourtLine(
-          width: 240,
-          height: 1.0,
-          color: isDark ? AppColors.courtLineNight : AppColors.courtLineDay,
-        ),
-        const SizedBox(height: 28),
-
-        // Operating Schedule
-        Text(
-          "OPERATING HOURS",
-          style: AppTypography.scoreboard.copyWith(
-            fontSize: 11,
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.w700,
-            color: AppColors.accentOrange,
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "MON – THU",
-              style: AppTypography.headingSmall.copyWith(
-                color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-              ),
-            ),
-            Text(
-              "2:00 PM – 10:00 PM",
-              style: AppTypography.scoreboard.copyWith(
-                color: isDark ? AppColors.textPrimaryNight : AppColors.deepBlue,
-              ),
-            ),
+        ArcoPageCover(
+          index: 'AR / 004',
+          kicker: 'KAWIT, CAVITE  ·  14.4445° N, 120.9038° E',
+          title: 'FIND US\nCOURTSIDE.',
+          lede: 'Inside The Pickleground PH on the Kawit–Noveleta line, minutes off Cavitex. The bar runs all night on weekends.',
+          imageAsset: 'assets/images/soda_trio_court.jpg',
+          caption: 'PLATE — SODA FLIGHT ON THE BASELINE',
+          actions: [
+            ArcoButton(text: 'Get Directions →', onPressed: _openDirections, variant: ArcoButtonVariant.primary),
+            ArcoTextLink(label: _copiedAddress ? 'Address copied' : 'Copy address', trailing: '', onTap: _copyAddress),
           ],
         ),
-        const SizedBox(height: 8),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "FRI – SUN",
-              style: AppTypography.headingSmall.copyWith(
-                fontWeight: FontWeight.w800,
-                color: AppColors.accentOrange,
-              ),
-            ),
-            Text(
-              "24 HOURS (NON-STOP)",
-              style: AppTypography.scoreboard.copyWith(
-                fontWeight: FontWeight.w800,
-                color: AppColors.accentOrange,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
-
-        // Live Open Status (Clean typography with dot indicator, NO emojis)
-        Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: _isOpenNow ? AppColors.statusOpen : AppColors.statusClosed,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              _isOpenNow ? "OPEN NOW • COURT & BAR ACTIVE" : "CLOSED NOW",
-              style: AppTypography.scoreboard.copyWith(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.8,
-                color: _isOpenNow ? AppColors.statusOpen : AppColors.statusClosed,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 36),
-
-        // Navigation Actions
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            ArcoButton(
-              text: "Open Maps / Waze →",
-              onPressed: _openDirections,
-              variant: ArcoButtonVariant.primary,
-            ),
-            ArcoButton(
-              text: _copiedAddress ? "Address Copied ✓" : "Copy Address",
-              icon: _copiedAddress ? CupertinoIcons.check_mark : CupertinoIcons.doc_on_clipboard,
-              onPressed: _copyAddress,
-              variant: ArcoButtonVariant.secondary,
-            ),
-          ],
-        ),
+        body,
       ],
     );
   }
 
-  /// Right Side Location Photograph & Court Geometry Overlay
-  Widget _buildLocationPhotoCard(bool isDark, {double height = 380}) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () => _openLocationLightbox(context),
-        child: Container(
-          height: height,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark ? const Color(0x338FA2B5) : AppColors.deepBlue.withValues(alpha: 0.08),
-              width: 1.0,
+  Widget _buildStory(StoreInfo store, ThemeController theme) {
+    final isDesktop = AppBreakpoints.isDesktop(context);
+    final isMobile = AppBreakpoints.isMobile(context);
+    final big = (isMobile ? 34.0 : (isDesktop ? 56.0 : 46.0));
+
+    Widget scoreRow(String days, String hours, {bool highlight = false}) {
+      final color = highlight ? AppColors.accentOrange : theme.primaryText;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(height: 1, color: theme.borderLight),
+          const SizedBox(height: 16),
+          Text(
+            days,
+            style: AppTypography.scoreboard.copyWith(
+              fontSize: 11,
+              letterSpacing: 1.8,
+              fontWeight: FontWeight.w700,
+              color: theme.tertiaryText,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.deepBlue.withValues(alpha: isDark ? 0.35 : 0.08),
-                blurRadius: 24,
-                offset: const Offset(0, 10),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            hours,
+            style: AppTypography.displayXL.copyWith(
+              fontSize: big,
+              height: 1.0,
+              letterSpacing: -big * 0.035,
+              fontWeight: FontWeight.w900,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          store.venue,
+          style: AppTypography.headingXL.copyWith(
+            fontSize: isMobile ? 26 : 32,
+            letterSpacing: -0.8,
+            fontWeight: FontWeight.w800,
+            color: theme.primaryText,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "${store.address}, ${store.province}",
+          style: AppTypography.bodyLarge.copyWith(fontSize: 16, color: theme.secondaryText),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "Beside the Kawit / Noveleta corridors with direct Cavitex access.",
+          style: AppTypography.body.copyWith(fontSize: 14, color: theme.tertiaryText),
+        ),
+        const SizedBox(height: 40),
+        scoreRow('MONDAY — THURSDAY', '2PM — 10PM'),
+        scoreRow('FRIDAY — SUNDAY', '24 HOURS.', highlight: true),
+        Container(height: 1, color: theme.borderLight),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            _LiveDot(color: _isOpenNow ? AppColors.statusOpen : AppColors.statusClosed, pulse: _isOpenNow),
+            const SizedBox(width: 10),
+            Text(
+              _isOpenNow ? "OPEN NOW  ·  COURT & BAR ACTIVE" : "CLOSED NOW  ·  SEE YOU AT 2PM",
+              style: AppTypography.scoreboard.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
+                color: _isOpenNow ? AppColors.statusOpen : AppColors.statusClosed,
+              ),
+            ),
+          ],
+        ),
+        if (!widget.standalone) ...[
+          const SizedBox(height: 40),
+          Wrap(
+            spacing: 28,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              ArcoButton(text: 'Get Directions →', onPressed: _openDirections, variant: ArcoButtonVariant.primary),
+              ArcoTextLink(
+                label: _copiedAddress ? 'Address copied' : 'Copy address',
+                trailing: '',
+                color: theme.primaryText,
+                onTap: _copyAddress,
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  _courtLocationAsset,
-                  fit: BoxFit.cover,
+        ],
+      ],
+    );
+  }
+
+  Widget _buildPhoto(ThemeController theme, {required double height}) {
+    final meta = AppTypography.scoreboard.copyWith(fontSize: 10.5, letterSpacing: 1.6, fontWeight: FontWeight.w700);
+    return Semantics(
+      button: true,
+      label: 'Open venue photograph',
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: _openLocationLightbox,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: SizedBox(
+                  height: height,
+                  width: double.infinity,
+                  child: Image.asset(_courtLocationAsset, fit: BoxFit.cover),
                 ),
-                // Dark gradient overlay for metadata legibility
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 90,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          AppColors.deepBlue.withValues(alpha: 0.8),
-                          AppColors.deepBlue.withValues(alpha: 0.0),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Top Left: Expand Indicator
-                Positioned(
-                  top: 16,
-                  left: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.deepBlue.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      "[ VIEW FULLSCREEN ]",
-                      style: TextStyle(
-                        fontFamily: AppTypography.monoFont,
-                        fontFamilyFallback: AppTypography.monoFontFallback,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: AppColors.accentOrange,
-                      ),
-                    ),
-                  ),
-                ),
-                // Top Right Official Logo Brand Mark
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xCC07111D) : AppColors.deepBlue.withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const ArcoLogo(
-                      height: 16,
-                      showText: false,
-                      color: AppColors.pureWhite,
-                    ),
-                  ),
-                ),
-                // Bottom Coordinates Caption
-                Positioned(
-                  bottom: 16,
-                  left: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "COORDINATES: 14.4445° N, 120.9038° E",
-                        style: AppTypography.scoreboard.copyWith(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.0,
-                          color: AppColors.pureWhite,
-                        ),
-                      ),
-                      Text(
-                        "THE PICKLEGROUND PH / KAWIT, CAVITE",
-                        style: AppTypography.receipt.copyWith(
-                          fontSize: 10,
-                          color: AppColors.softSand,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Text('14.4445° N, 120.9038° E', style: meta.copyWith(color: AppColors.accentOrange)),
+                  const Spacer(),
+                  Text('KAWIT ARENA', style: meta.copyWith(color: theme.tertiaryText)),
+                ],
+              ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Status dot with a slow breathing ring while the bar is open.
+class _LiveDot extends StatefulWidget {
+  final Color color;
+  final bool pulse;
+  const _LiveDot({required this.color, required this.pulse});
+
+  @override
+  State<_LiveDot> createState() => _LiveDotState();
+}
+
+class _LiveDotState extends State<_LiveDot> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.pulse && !AppMotion.isReducedMotion(context)) {
+      _c.repeat();
+    } else {
+      _c.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 18,
+      height: 18,
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (context, _) => Stack(
+          alignment: Alignment.center,
+          children: [
+            if (_c.isAnimating)
+              Container(
+                width: 8 + 10 * _c.value,
+                height: 8 + 10 * _c.value,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.color.withValues(alpha: 0.35 * (1 - _c.value)),
+                ),
+              ),
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(color: widget.color, shape: BoxShape.circle),
+            ),
+          ],
         ),
       ),
     );
