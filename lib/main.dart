@@ -72,10 +72,11 @@ class _ArcoffeeAppState extends State<ArcoffeeApp> {
                 ? AppTheme.darkTheme
                 : AppTheme.lightTheme,
             home: SplashScreen(
-              homeScreen: AppScaffold(
+              homeBuilder: (initialTabIndex) => AppScaffold(
                 menuRepository: _menuRepository,
                 storeRepository: _storeRepository,
                 galleryRepository: _galleryRepository,
+                initialTabIndex: initialTabIndex,
               ),
             ),
           ),

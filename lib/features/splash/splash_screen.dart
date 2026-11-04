@@ -24,9 +24,10 @@ import '../app_scaffold.dart';
 ///
 /// Court QR scans (?source=qr, ?court=N) get a sub-second version that opens on the Menu.
 class SplashScreen extends StatefulWidget {
-  final Widget? homeScreen;
+  /// Builds the site, opened on the given tab (QR scans open the Menu).
+  final Widget Function(int initialTabIndex)? homeBuilder;
 
-  const SplashScreen({super.key, this.homeScreen});
+  const SplashScreen({super.key, this.homeBuilder});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -86,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   void _navigateToHome() {
     if (_isNavigating || !mounted) return;
     _isNavigating = true;
-    final target = widget.homeScreen ??
+    final target = widget.homeBuilder?.call(_initialTabIndex) ??
         _createDefaultHomeScreen(initialTabIndex: _initialTabIndex);
     final reduced = MediaQuery.of(context).disableAnimations;
 
