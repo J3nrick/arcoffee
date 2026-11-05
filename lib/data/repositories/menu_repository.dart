@@ -70,7 +70,7 @@ class AppMenuRepository implements MenuRepository {
       accentColor: AppColors.accentOrange,
       caffeineNote: 'High Caffeine',
       size: 'Hot 12oz / Iced 16oz',
-      imageAsset: 'assets/images/latte_pull_portrait.png',
+      imageAsset: 'assets/images/latte_pull_portrait.jpg',
     ),
 
     // ==========================================
@@ -88,7 +88,7 @@ class AppMenuRepository implements MenuRepository {
       accentColor: Color(0xFF4E342E),
       caffeineNote: 'High Caffeine',
       size: 'Hot 12oz / Iced 16oz',
-      imageAsset: 'assets/images/espresso_crema_latte.png',
+      imageAsset: 'assets/images/espresso_crema_latte.jpg',
     ),
     const MenuItem(
       id: 'c5',
@@ -120,7 +120,7 @@ class AppMenuRepository implements MenuRepository {
       accentColor: AppColors.warmCoffee,
       caffeineNote: 'High Caffeine',
       size: 'Hot 12oz / Iced 16oz',
-      imageAsset: 'assets/images/syrup_scale_prep.png',
+      imageAsset: 'assets/images/syrup_scale_prep.jpg',
     ),
     const MenuItem(
       id: 'c7',
@@ -174,7 +174,7 @@ class AppMenuRepository implements MenuRepository {
       accentColor: Color(0xFF5D4037),
       caffeineNote: 'Caffeine-Free',
       size: '16oz / 22oz Iced',
-      imageAsset: 'assets/images/milo_overload_court.png',
+      imageAsset: 'assets/images/milo_overload_court.jpg',
     ),
     const MenuItem(
       id: 'nc2',
@@ -190,7 +190,7 @@ class AppMenuRepository implements MenuRepository {
       accentColor: Color(0xFFD84315),
       caffeineNote: 'Caffeine-Free',
       size: '16oz / 22oz Iced',
-      imageAsset: 'assets/images/stand_poster_specials.png',
+      imageAsset: 'assets/images/stand_poster_specials.jpg',
     ),
 
     // ==========================================
@@ -255,7 +255,7 @@ class AppMenuRepository implements MenuRepository {
       accentColor: Color(0xFFFF7043),
       caffeineNote: 'Zero Caffeine',
       size: '16oz / 22oz Iced',
-      imageAsset: 'assets/images/soda_series_studio.png',
+      imageAsset: 'assets/images/soda_series_studio.jpg',
     ),
 
     // ==========================================
@@ -276,7 +276,7 @@ class AppMenuRepository implements MenuRepository {
       accentColor: AppColors.matchaGreen,
       caffeineNote: 'Clean L-Theanine Energy',
       size: '16oz / 22oz Iced',
-      imageAsset: 'assets/images/matcha_pour.png',
+      imageAsset: 'assets/images/matcha_pour.jpg',
     ),
     const MenuItem(
       id: 'm2',
@@ -291,7 +291,7 @@ class AppMenuRepository implements MenuRepository {
       accentColor: Color(0xFF2E7D32),
       caffeineNote: 'Medium L-Theanine',
       size: '16 oz Iced',
-      imageAsset: 'assets/images/matcha_pour.png',
+      imageAsset: 'assets/images/matcha_pour.jpg',
     ),
   ];
 

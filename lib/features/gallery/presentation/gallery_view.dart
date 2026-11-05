@@ -58,7 +58,7 @@ class _GalleryViewState extends State<GalleryView> {
       'story': 'Zero-heat sparkling sodas resting right on the pickleball court boundary line.',
     },
     {
-      'asset': 'assets/images/latte_pull_portrait.png',
+      'asset': 'assets/images/latte_pull_portrait.jpg',
       'title': 'SIGNATURE POUR',
       'caption': 'ICED LATTE CRAFT',
       'story': 'Velvety espresso pouring straight over rich chilled milk on the bar counter.',

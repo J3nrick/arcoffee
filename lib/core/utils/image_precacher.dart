@@ -8,25 +8,25 @@ class ImagePrecacher {
   /// Priority local asset images to preload on app startup
   static const List<String> priorityAssetPaths = [
     'assets/547188584_122096374029023682_3566562690668451689_n_2.jpg',
-    'assets/images/milo_overload_court.png',
+    'assets/images/milo_overload_court.jpg',
     'assets/images/mango_americano_counter.jpg',
     'assets/images/court_arena_drink.jpg',
     'assets/images/community_milo_jersey.jpg',
     'assets/images/lychee_soda_chat_paddle.jpg',
     'assets/images/green_apple_court_line.jpg',
     'assets/images/portafilter_tamp.jpg',
-    'assets/images/latte_pull_portrait.png',
+    'assets/images/latte_pull_portrait.jpg',
     'assets/images/spanish_latte_mascot.jpg',
-    'assets/images/matcha_pour.png',
-    'assets/images/soda_series_studio.png',
+    'assets/images/matcha_pour.jpg',
+    'assets/images/soda_series_studio.jpg',
     'assets/images/soda_trio_court.jpg',
     'assets/images/mango_americano_espresso.jpg',
-    'assets/images/stand_poster_specials.png',
+    'assets/images/stand_poster_specials.jpg',
     'assets/images/espresso_pour_latte.jpg',
-    'assets/images/espresso_crema_latte.png',
-    'assets/images/syrup_scale_prep.png',
+    'assets/images/espresso_crema_latte.jpg',
+    'assets/images/syrup_scale_prep.jpg',
     'assets/images/green_apple_sky.jpg',
-    'assets/images/menu_board.png',
+    'assets/images/menu_board.jpg',
   ];
 
   static Future<void> precacheCoreAssets(BuildContext context) async {

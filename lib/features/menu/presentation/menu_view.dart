@@ -52,7 +52,7 @@ class _MenuViewState extends State<MenuView> {
 
   void _showMenuBoard() => showArcoLightbox(
         context,
-        asset: 'assets/images/menu_board.png',
+        asset: 'assets/images/menu_board.jpg',
         title: 'OFFICIAL PRINTED MENU BOARD  ·  THE PICKLEGROUND PH, KAWIT',
       );
 
