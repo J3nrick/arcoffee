@@ -231,7 +231,7 @@ class HomeStorySection extends StatelessWidget {
             asset: 'assets/images/soda_trio_court.jpg',
             kicker: '02  ·  THE COURT CARD',
             title: 'Pick it before you play.',
-            body: "Ordering from your court is coming soon. Until then, save your drinks to a Court Card and show it at the bar between games. We'll pour it fresh.",
+            body: "Save your drinks to a Court Card and show it at the bar between games. We'll pour it fresh.",
             reversed: true,
             action: ArcoButton(text: 'Open your Court Card →', onPressed: onOpenCourtCard, variant: ArcoButtonVariant.primary),
           ),
@@ -666,7 +666,7 @@ class HomeJoinSection extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 440),
             child: Text(
-              'Late-night session schedules, court drops and off-menu creations, straight to your inbox.',
+              'Late-night session schedules, court drops and off-menu creations, posted first on Instagram.',
               textAlign: isDesktop ? TextAlign.start : TextAlign.center,
               style: AppTypography.body.copyWith(fontSize: 16, height: 1.6, color: theme.secondaryText),
             ),
